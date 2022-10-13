@@ -61,7 +61,6 @@ public class CosmosDBLayer {
 	
 	public CosmosItemResponse<Object> delUser(UserDAO user) {
 		init();
-		users.
 		return users.deleteItem(user, new CosmosItemRequestOptions());
 	}
 	

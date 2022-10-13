@@ -1,7 +1,5 @@
 package temppackage;
 
-import java.util.Arrays;
-
 /**
  * Represents a User, as returned to the clients
  */
@@ -9,15 +7,15 @@ public class User {
 	private String id;
 	private String name;
 	private String pwd;
-	private String photoId;
-	private String[] channelIds;
-	public User(String id, String name, String pwd, String photoId, String[] channelIds) {
+	private String nickname;
+	private byte[] photo;
+	public User(String id, String name, String pwd, String nickname, byte[] photo) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.pwd = pwd;
-		this.photoId = photoId;
-		this.channelIds = channelIds;
+		this.nickname = nickname;
+		this.photo = photo;
 	}
 	public String getId() {
 		return id;
@@ -37,22 +35,17 @@ public class User {
 	public void setPwd(String pwd) {
 		this.pwd = pwd;
 	}
-	public String getPhotoId() {
-		return photoId;
+	public String getNickname() {return this.nickname;}
+	public void setNickname(String nickname) {this.nickname = nickname;}
+	public byte[] getPhoto() {
+		return photo;
 	}
-	public void setPhotoId(String photoId) {
-		this.photoId = photoId;
-	}
-	public String[] getChannelIds() {
-		return channelIds == null ? new String[0] : channelIds ;
-	}
-	public void setChannelIds(String[] channelIds) {
-		this.channelIds = channelIds;
+	public void setPhoto(byte[] photo) {
+		this.photo = photo;
 	}
 	@Override
 	public String toString() {
-		return "User [id=" + id + ", name=" + name + ", pwd=" + pwd + ", photoId=" + photoId + ", channelIds="
-				+ Arrays.toString(channelIds) + "]";
+		return "User [id=" + id + ", name=" + name + ", pwd=" + pwd + "]";
 	}
 
 }
