@@ -70,7 +70,7 @@ public class AzureManagement {
 
 	// Name of application server to be launched in each regions -- launching the application
 	// server must be done using mvn, as you have been doing
-	// TODO: this name should be the same as defined in your app
+	// This name should be the same as defined in your app
 	static final String[] AZURE_APP_NAME = Arrays.stream(REGIONS).map(reg -> "scc23app" + reg.name() + MY_SUFFIX)
 			.toArray(String[]::new);
 
