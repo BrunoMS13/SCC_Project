@@ -6,7 +6,10 @@ import java.util.Set;
 import jakarta.ws.rs.core.Application;
 
 public class MainApplication extends Application
-{
+{	
+
+	// URL -> https://scc23app-westeurope-58569.azurewebsites.net/
+	
 	private Set<Object> singletons = new HashSet<Object>();
 	private Set<Class<?>> resources = new HashSet<Class<?>>();
 
