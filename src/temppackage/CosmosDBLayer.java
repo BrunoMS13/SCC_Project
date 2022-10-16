@@ -13,8 +13,8 @@ import com.azure.cosmos.util.CosmosPagedIterable;
 
 public class CosmosDBLayer {
 	private static final String CONNECTION_URL = "https://scc58569.documents.azure.com:443/";
-	private static final String DB_KEY = "yDjKGC9ca0CBeM2qfpYf8HTzmYDJmWmULvumHiuc6mCscwWc27iD6d6lKy3fPv2o7Nj0mJdscGBxkHP7aVuofA==";
-	private static final String DB_NAME = "scc58569db";
+	private static final String DB_KEY = "Db0g6Zbdb7P9MTPhMppUn4toDTloc9a5p0323SavkQ2qM9HWSeipOJzRHLjo3BiQByHtN99tGDxKzVc0PLc4Fw==";
+	private static final String DB_NAME = "scc23db";
 	
 	private static CosmosDBLayer instance;
 
@@ -68,7 +68,12 @@ public class CosmosDBLayer {
 		init();
 		return users.createItem(user);
 	}
-	
+
+	public CosmosItemResponse<UserDAO> updateUser(UserDAO user) {
+		init();
+		return users.upsertItem(user);
+	}
+
 	public CosmosPagedIterable<UserDAO> getUserById( String id) {
 		init();
 		return users.queryItems("SELECT * FROM users WHERE users.id=\"" + id + "\"", new CosmosQueryRequestOptions(), UserDAO.class);

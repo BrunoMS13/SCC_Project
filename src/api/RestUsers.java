@@ -12,20 +12,20 @@ public interface RestUsers {
     @POST
     @Path("/")
     @Consumes(MediaType.APPLICATION_JSON)
-    void createUser(UserDAO user);
+    void createUser(String id, String name, @QueryParam(PASSWORD) String password, String nickname, String photoId);
 
     @DELETE
-    @Path("/{nickname}")
+    @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    boolean deleteUser(String nickname, @QueryParam(PASSWORD) String password);
+    void deleteUser(@PathParam("id") String id, @QueryParam(PASSWORD) String password);
 
     @PUT
-    @Path("/{nickname}")
-    @Consumes(MediaType.APPLICATION_OCTET_STREAM)
-    void updateUser(String name, String nickname, @QueryParam(PASSWORD) String password, byte[] photo);
+    @Path("/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    void updateUser(@PathParam("id") String id, String name, String nickname, @QueryParam(PASSWORD) String password, String photoId);
 
     @GET
-    @Path("/{nickname}")
+    @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    UserDAO getUser(@PathParam("nickname") String nickname, @QueryParam(PASSWORD) String password);
+    UserDAO getUser(@PathParam("id") String id, @QueryParam(PASSWORD) String password);
 }

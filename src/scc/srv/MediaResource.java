@@ -1,4 +1,4 @@
-package srv;
+package scc.srv;
 
 import jakarta.ws.rs.*;
 
@@ -25,7 +25,7 @@ public class MediaResource
 	 */
 	@POST
 	@Path("/")
-	@Consumes({MediaType.APPLICATION_OCTET_STREAM, MediaType.TEXT_PLAIN})
+	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
 	public void upload(byte[] contents, String filename) {
 		try {
 			BinaryData data = BinaryData.fromBytes(contents);
@@ -41,8 +41,6 @@ public class MediaResource
 
 			// Upload contents from BinaryData (check documentation for other alternatives)
 			blob.upload(data);
-
-			System.out.println("File uploaded: " + filename);
 
 		} catch( Exception e) {
 			e.printStackTrace();

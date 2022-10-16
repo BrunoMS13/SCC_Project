@@ -12,19 +12,19 @@ public class UserDAO {
 	private String name;
 	private String nickname;
 	private String pwd;
-	private byte[] photo;
+	private String photoId;
 
 	public UserDAO() {
 	}
 	public UserDAO(User u) {
-		this(u.getId(), u.getName(), u.getPwd(), u.getNickname(), u.getPhoto());
+		this(u.getId(), u.getName(), u.getPwd(), u.getNickname(), u.getPhotoId());
 	}
-	public UserDAO(String id, String name, String pwd, String nickname, byte[] photo) {
+	public UserDAO(String id, String name, String pwd, String nickname, String photoId) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.pwd = pwd;
-		this.photo = photo;
+		this.photoId = photoId;
 		this.nickname = nickname;
 	}
 	public String get_rid() {
@@ -63,14 +63,14 @@ public class UserDAO {
 	public void setNickname(String nickname) {
 		this.nickname = nickname;
 	}
-	public byte[] getPhoto() {
-		return photo;
+	public String getPhotoId() {
+		return this.photoId;
 	}
-	public void setPhotoId(byte[] photo) {
-		this.photo = photo;
+	public void setPhotoId(String photoId) {
+		this.photoId = photoId;
 	}
 	public User toUser() {
-		return new User(id, name, pwd, nickname, photo);
+		return new User(id, name, pwd, nickname, photoId);
 	}
 	@Override
 	public String toString() {

@@ -8,14 +8,14 @@ public class User {
 	private String name;
 	private String pwd;
 	private String nickname;
-	private byte[] photo;
-	public User(String id, String name, String pwd, String nickname, byte[] photo) {
+	private String photoId;
+	public User(String id, String name, String pwd, String nickname, String photoId) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.pwd = pwd;
 		this.nickname = nickname;
-		this.photo = photo;
+		this.photoId = photoId;
 	}
 	public String getId() {
 		return id;
@@ -37,11 +37,11 @@ public class User {
 	}
 	public String getNickname() {return this.nickname;}
 	public void setNickname(String nickname) {this.nickname = nickname;}
-	public byte[] getPhoto() {
-		return photo;
+	public String getPhotoId() {
+		return photoId;
 	}
-	public void setPhoto(byte[] photo) {
-		this.photo = photo;
+	public void setPhoto(String photo) {
+		this.photoId = photoId;
 	}
 	@Override
 	public String toString() {
