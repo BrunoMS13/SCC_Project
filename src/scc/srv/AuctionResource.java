@@ -1,6 +1,7 @@
 package scc.srv;
 
 import api.RestAuctions;
+import com.azure.cosmos.util.CosmosPagedIterable;
 import jakarta.ws.rs.*;
 import temppackage.*;
 
@@ -24,7 +25,11 @@ public class AuctionResource implements RestAuctions {
 
     @Override
     public void createBid(String id, String bidID, String bidderId, int bidValue) {
+        CosmosPagedIterable<AuctionDAO> resGet = db.getAuctionById(id);
+        AuctionDAO temp = resGet.iterator().next();
 
+        temp.addBid(new Bid(bidID, bidderId, bidValue));
+        // TODO
     }
 
     @Override
