@@ -20,7 +20,7 @@ public interface RestAuctions {
      */
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    void createAuction(String id, String title, String description, String imageId, String ownerId, int endTime, int minPrice);
+    void createAuction(String id, String title, String description, String imageId, String ownerId, long endTime, int minPrice);
 
     /**
      * Updates an auction.

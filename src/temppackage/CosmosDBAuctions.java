@@ -16,9 +16,9 @@ public class CosmosDBAuctions {
     private static final String DB_KEY = "Db0g6Zbdb7P9MTPhMppUn4toDTloc9a5p0323SavkQ2qM9HWSeipOJzRHLjo3BiQByHtN99tGDxKzVc0PLc4Fw==";
     private static final String DB_NAME = "scc23db";
 
-    private static CosmosDBLayer instance;
+    private static CosmosDBAuctions instance;
 
-    public static synchronized CosmosDBLayer getInstance() {
+    public static synchronized CosmosDBAuctions getInstance() {
         if( instance != null)
             return instance;
 
@@ -32,7 +32,7 @@ public class CosmosDBAuctions {
                 .connectionSharingAcrossClientsEnabled(true)
                 .contentResponseOnWriteEnabled(true)
                 .buildClient();
-        instance = new CosmosDBLayer( client);
+        instance = new CosmosDBAuctions( client);
         return instance;
 
     }
