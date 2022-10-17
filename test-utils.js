@@ -116,6 +116,7 @@ function genNewUser(context, events, done) {
 	context.vars.id = first + "." + last
 	context.vars.name = first + " " + last
 	context.vars.pwd = `${Faker.internet.password()}`
+	context.vars.nickname = `${Faker.internet.nickname()}`
 	return done()
 }
 
