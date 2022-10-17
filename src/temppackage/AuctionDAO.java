@@ -14,7 +14,7 @@ public class AuctionDAO {
 
     private AuctionStatus status;
 
-    public AuctionDAO(String id, String title, String description, String imageId, String ownerId, int endTime, int minPrice) {
+    public AuctionDAO(String id, String title, String description, String imageId, String ownerId, long endTime, int minPrice) {
         this.id = id;
         this.title = title;
         this.description = description;

@@ -11,7 +11,7 @@ public class Auction {
 
     private AuctionStatus status;
 
-    public Auction(String id, String title, String description, String imageId, String ownerId, int endTime, int minPrice) {
+    public Auction(String id, String title, String description, String imageId, String ownerId, long endTime, int minPrice) {
         this.title = title;
         this.description = description;
         this.ownerId = ownerId;

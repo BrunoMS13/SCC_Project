@@ -3,16 +3,17 @@ package scc.srv;
 import api.RestUsers;
 import com.azure.cosmos.util.CosmosPagedIterable;
 import temppackage.CosmosDBLayer;
+import temppackage.CosmosDBUsers;
 import temppackage.UserDAO;
 
 import javax.ws.rs.QueryParam;
 
 public class UserResource implements RestUsers {
 
-    CosmosDBLayer db;
+    CosmosDBUsers db;
 
     public UserResource() {
-        this.db = CosmosDBLayer.getInstance();
+        this.db = CosmosDBUsers.getInstance();
     }
 
     @Override
@@ -61,5 +62,6 @@ public class UserResource implements RestUsers {
         ur.deleteUser("a333444", "c12312asdasd");
 
         System.out.println(ur.getUser("a333444", "c12312asdasd"));
+
     }
 }
