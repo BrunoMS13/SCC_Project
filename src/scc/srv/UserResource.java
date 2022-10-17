@@ -59,5 +59,7 @@ public class UserResource implements RestUsers {
         System.out.println(u);
 
         ur.deleteUser("a333444", "c12312asdasd");
+
+        System.out.println(ur.getUser("a333444", "c12312asdasd"));
     }
 }

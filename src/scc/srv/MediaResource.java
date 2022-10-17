@@ -18,7 +18,7 @@ import jakarta.ws.rs.core.MediaType;
 public class MediaResource
 {
 
-	String storageConnectionString = "DefaultEndpointsProtocol=https;AccountName=58569scc;AccountKey=7gFTjRrpVbKZfA1zmmN/b28PIJStIdrO4UsMMovJESEqYDdhN1WyJavpgXhCD8yxin330Yq6Mk0u+AStnycc/g==;EndpointSuffix=core.windows.net";
+	String storageConnectionString = "DefaultEndpointsProtocol=https;AccountName=sccstwesteurope58569;AccountKey=xdWfFjojTkmXu9WalAAp1GyUm5HyiMinR6LmAY12SQSZkAb523mOHZWzhzeBapJ56IeRERo8DEQT+AStDepDfA==;EndpointSuffix=core.windows.net";
 
 	/**
 	 * Post a new image.

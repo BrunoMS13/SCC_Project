@@ -1,5 +1,5 @@
 config:
-  target: 'https://scc-backend-4204.azurewebsites.net/rest'
+  target: 'https://scc23app-westeurope-58569.azurewebsites.net/rest'
   plugins:
     metrics-by-endpoint: {}
   processor: "./test-utils.js"
@@ -34,7 +34,7 @@ scenarios:
               id: "{{ id }}"
               name: "{{ name }}"
               pwd: "{{ pwd }}"
-              photoId: "{{ imageId }}"
+              nickname: "{{ nickname }}"
               channelIds: []
             afterResponse: "genNewUserReply"    # capture result and store in file
         count: 50
