@@ -3,7 +3,6 @@ package data_classes;
 import utils.AuctionStatus;
 
 import java.util.HashSet;
-import java.util.Set;
 
 public class AuctionDAO {
     private String _rid;
@@ -16,7 +15,6 @@ public class AuctionDAO {
     private String imageId;
     private int minPrice;
     private long endingTime;
-    private Set<Bid> bids;
 
     private AuctionStatus status;
 
@@ -29,7 +27,6 @@ public class AuctionDAO {
         this.minPrice = minPrice;
         this.endingTime = endTime;
         this.status = AuctionStatus.OPEN;
-        this.bids = new HashSet<Bid>();
     }
     public String get_rid() {
         return _rid;
@@ -90,9 +87,6 @@ public class AuctionDAO {
     }
     public AuctionStatus getStatus() {
         return this.status;
-    }
-    public void addBid(Bid bid) {
-        this.bids.add(bid);
     }
     @Override
     public String toString() {

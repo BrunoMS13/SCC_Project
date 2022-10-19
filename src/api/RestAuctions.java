@@ -1,8 +1,12 @@
 package api;
 
+import data_classes.BidDAO;
+import data_classes.QuestionDAO;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import utils.AuctionStatus;
+
+import java.util.List;
 
 @Path("/auction")
 public interface RestAuctions {
@@ -57,7 +61,7 @@ public interface RestAuctions {
     @Path("/{" + ID + "}/bid")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    String[] listBids(@PathParam(ID) String id);;
+    List<BidDAO> listBids(@PathParam(ID) String id);;
 
     /**
      * Creates a question.
@@ -81,7 +85,7 @@ public interface RestAuctions {
     @Path("/{" + ID + "}/question")
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
-    void replyToQuestion(@PathParam(ID) String id, String questionId, String userId, String text);
+    void replyToQuestion(@PathParam(ID) String id, String questionId, String userId, String questionBeingRespondedId, String text);
 
     /**
      * Lists all the questions to the respective auction ID.
@@ -91,5 +95,5 @@ public interface RestAuctions {
     @Path("/{" + ID + "}/question")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    String[] listQuestions(@PathParam(ID) String id);
+    List<QuestionDAO> listQuestions(@PathParam(ID) String id);
 }
