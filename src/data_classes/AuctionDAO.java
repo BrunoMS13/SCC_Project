@@ -1,6 +1,14 @@
-package temppackage;
+package data_classes;
 
-public class Auction {
+import utils.AuctionStatus;
+
+import java.util.HashSet;
+import java.util.Set;
+
+public class AuctionDAO {
+    private String _rid;
+    private String _ts;
+    private String id;
     private String ownerId;
     private String winnerId;
     private String title;
@@ -8,10 +16,12 @@ public class Auction {
     private String imageId;
     private int minPrice;
     private long endingTime;
+    private Set<Bid> bids;
 
     private AuctionStatus status;
 
-    public Auction(String id, String title, String description, String imageId, String ownerId, long endTime, int minPrice) {
+    public AuctionDAO(String id, String title, String description, String imageId, String ownerId, long endTime, int minPrice) {
+        this.id = id;
         this.title = title;
         this.description = description;
         this.ownerId = ownerId;
@@ -19,6 +29,25 @@ public class Auction {
         this.minPrice = minPrice;
         this.endingTime = endTime;
         this.status = AuctionStatus.OPEN;
+        this.bids = new HashSet<Bid>();
+    }
+    public String get_rid() {
+        return _rid;
+    }
+    public void set_rid(String _rid) {
+        this._rid = _rid;
+    }
+    public String get_ts() {
+        return _ts;
+    }
+    public void set_ts(String _ts) {
+        this._ts = _ts;
+    }
+    public String getId() {
+        return id;
+    }
+    public void setId(String id) {
+        this.id = id;
     }
     public void setTitle(String title) {
         this.title = title;
@@ -61,6 +90,9 @@ public class Auction {
     }
     public AuctionStatus getStatus() {
         return this.status;
+    }
+    public void addBid(Bid bid) {
+        this.bids.add(bid);
     }
     @Override
     public String toString() {

@@ -2,7 +2,7 @@ package api;
 
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
-import temppackage.AuctionStatus;
+import utils.AuctionStatus;
 
 @Path("/auction")
 public interface RestAuctions {

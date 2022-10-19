@@ -2,15 +2,17 @@ package scc.srv;
 
 import api.RestAuctions;
 import com.azure.cosmos.util.CosmosPagedIterable;
+import data_classes.AuctionDAO;
 import data_classes.Bid;
-import temppackage.*;
+import utils.AuctionStatus;
+import utils.CosmosDBLayer;
 
 public class AuctionResource implements RestAuctions {
 
-    CosmosDBAuctions db;
+    CosmosDBLayer db;
 
     public AuctionResource() {
-        this.db = CosmosDBAuctions.getInstance();
+        this.db = CosmosDBLayer.getInstance();
     }
 
     @Override

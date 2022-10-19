@@ -1,4 +1,4 @@
-package temppackage;
+package utils;
 
 public enum AuctionStatus {
     OPEN,
