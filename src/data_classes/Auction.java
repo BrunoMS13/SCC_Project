@@ -1,4 +1,6 @@
-package temppackage;
+package data_classes;
+
+import utils.AuctionStatus;
 
 public class Auction {
     private String ownerId;

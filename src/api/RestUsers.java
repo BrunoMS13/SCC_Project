@@ -1,7 +1,7 @@
 package api;
 
 import jakarta.ws.rs.core.MediaType;
-import temppackage.UserDAO;
+import data_classes.UserDAO;
 
 import javax.ws.rs.*;
 

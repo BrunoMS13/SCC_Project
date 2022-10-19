@@ -1,7 +1,9 @@
 package scc.srv;
 
+import api.RestMedia;
 import jakarta.ws.rs.*;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import com.azure.core.util.BinaryData;
@@ -14,18 +16,11 @@ import jakarta.ws.rs.core.MediaType;
 /**
  * Resource for managing media files, such as images.
  */
-@Path("/media")
-public class MediaResource
+public class MediaResource implements RestMedia
 {
 
-	String storageConnectionString = "DefaultEndpointsProtocol=https;AccountName=sccstwesteurope58569;AccountKey=xdWfFjojTkmXu9WalAAp1GyUm5HyiMinR6LmAY12SQSZkAb523mOHZWzhzeBapJ56IeRERo8DEQT+AStDepDfA==;EndpointSuffix=core.windows.net";
+	private String storageConnectionString = "DefaultEndpointsProtocol=https;AccountName=sccstwesteurope58569;AccountKey=xdWfFjojTkmXu9WalAAp1GyUm5HyiMinR6LmAY12SQSZkAb523mOHZWzhzeBapJ56IeRERo8DEQT+AStDepDfA==;EndpointSuffix=core.windows.net";
 
-	/**
-	 * Post a new image.
-	 */
-	@POST
-	@Path("/")
-	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
 	public void upload(byte[] contents, String filename) {
 		try {
 			BinaryData data = BinaryData.fromBytes(contents);
@@ -47,13 +42,7 @@ public class MediaResource
 		}
 	}
 
-	/**
-	 * Return the contents of an image.
-	 */
-	@GET
-	@Path("/{filename}")
-	@Produces(MediaType.APPLICATION_OCTET_STREAM)
-	public byte[] download(@PathParam("filename") String filename) {
+	public byte[] download(String filename) {
 		byte[] arr = null;
 		try {
 			// Get container client.
@@ -84,5 +73,13 @@ public class MediaResource
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<String> list() {
 		return new ArrayList<String>();
+	}
+
+	public static void main(String[] args) {
+		MediaResource mr = new MediaResource();
+		// If already exists, it throws exception.
+		//mr.upload("asdasdasd".getBytes(), "random");
+
+		System.out.println(new String(mr.download("cats.1.jpeg")));
 	}
 }

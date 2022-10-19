@@ -1,4 +1,4 @@
-package temppackage;
+package data_classes;
 
 /**
  * Represents a User, as returned to the clients
