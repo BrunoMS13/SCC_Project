@@ -2,23 +2,22 @@ package scc.srv;
 
 import api.RestUsers;
 import com.azure.cosmos.util.CosmosPagedIterable;
-import temppackage.CosmosDBLayer;
-import temppackage.CosmosDBUsers;
-import temppackage.UserDAO;
+import utils.CosmosDBLayer;
+import data_classes.UserDAO;
 
 import javax.ws.rs.QueryParam;
 
 public class UserResource implements RestUsers {
 
-    CosmosDBUsers db;
+    CosmosDBLayer db;
 
     public UserResource() {
-        this.db = CosmosDBUsers.getInstance();
+        this.db = CosmosDBLayer.getInstance();
     }
 
     @Override
     public void createUser(String id, String name, @QueryParam(PASSWORD) String password, String nickname, String photoId) {
-        System.out.println("Creating user -> " + name);
+        System.out.println("Creating user: " + name);
         db.putUser(new UserDAO(id, name, scc.utils.Hash.of(password), nickname, photoId));
     }
 

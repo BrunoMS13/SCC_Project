@@ -1,6 +1,4 @@
-package temppackage;
-
-import java.util.Arrays;
+package data_classes;
 
 /**
  * Represents a User, as stored in the database
