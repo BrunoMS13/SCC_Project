@@ -31,7 +31,14 @@ public class UserResource implements RestUsers {
 
     @Override
     public void updateUser(String id, String name, String nickname, String password, String photoId) {
-
+        System.out.println("Updating user with ID: " + id);
+        UserDAO u = getUser(id, password);
+        if (u != null) {
+            if(!name.equals("")) u.setName(name);
+            if(!nickname.equals("")) u.setName(nickname);
+            if(!photoId.equals("")) u.setName(photoId);
+            db.updateUser(u);
+        }
     }
 
     @Override
@@ -53,6 +60,7 @@ public class UserResource implements RestUsers {
     public static void main(String[] args) {
 
         UserResource ur = new UserResource();
+        /*
         ur.createUser("a333444","b","c12312asdasd","d", "e");
 
         UserDAO u = ur.getUser("a333444", "c12312asdasd");
@@ -62,6 +70,14 @@ public class UserResource implements RestUsers {
         ur.deleteUser("a333444", "c12312asdasd");
 
         System.out.println(ur.getUser("a333444", "c12312asdasd"));
+        */
+        ur.createUser("a25","b","c12312asdasd","d", "e");
 
+        System.out.println(ur.getUser("a25", "c12312asdasd"));
+
+        ur.updateUser("a25", "c", "e", "c12312asdasd", "r");
+        System.out.println("aaaaa");
+        System.out.println(ur.getUser("a25", "c12312asdasd"));
+        ur.deleteUser("a25", "c12312asdasd");
     }
 }
