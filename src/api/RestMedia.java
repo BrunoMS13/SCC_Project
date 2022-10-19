@@ -6,22 +6,24 @@ import jakarta.ws.rs.core.MediaType;
 @Path("/media")
 public interface RestMedia {
 
+    String FILENAME = "filename";
+
     /**
      * Uploads media.
      * @param contents - bytes of the media content.
-     * @param id - media ID.
+     * @param filename - media ID.
      */
     @POST
     @Consumes(MediaType.APPLICATION_OCTET_STREAM)
-    void upload(byte[] contents, String id);
+    void upload(byte[] contents, @QueryParam(FILENAME) String filename);
 
     /**
      * Downloads media.
-     * @param id - media ID.
+     * @param filename - media ID.
      * @return byte array of the media with the respective ID.
      */
     @GET
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/{filename}")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    byte[] download(String id);
+    byte[] download(@PathParam(FILENAME) String filename);
 }
