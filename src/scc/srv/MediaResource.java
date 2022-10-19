@@ -1,5 +1,6 @@
 package scc.srv;
 
+import api.RestMedia;
 import jakarta.ws.rs.*;
 
 import java.nio.charset.StandardCharsets;
@@ -15,18 +16,12 @@ import jakarta.ws.rs.core.MediaType;
 /**
  * Resource for managing media files, such as images.
  */
-@Path("/media")
-public class MediaResource
+public class MediaResource implements RestMedia
 {
 
-	String storageConnectionString = "DefaultEndpointsProtocol=https;AccountName=sccstwesteurope58569;AccountKey=xdWfFjojTkmXu9WalAAp1GyUm5HyiMinR6LmAY12SQSZkAb523mOHZWzhzeBapJ56IeRERo8DEQT+AStDepDfA==;EndpointSuffix=core.windows.net";
+	private String storageConnectionString = "DefaultEndpointsProtocol=https;AccountName=sccstwesteurope58569;AccountKey=xdWfFjojTkmXu9WalAAp1GyUm5HyiMinR6LmAY12SQSZkAb523mOHZWzhzeBapJ56IeRERo8DEQT+AStDepDfA==;EndpointSuffix=core.windows.net";
 
-	/**
-	 * Post a new image.
-	 */
-	@POST
-	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
-	public String upload(byte[] contents, @QueryParam("filename") String filename) {
+	public void upload(byte[] contents, String filename) {
 		try {
 			BinaryData data = BinaryData.fromBytes(contents);
 
@@ -45,16 +40,9 @@ public class MediaResource
 		} catch( Exception e) {
 			e.printStackTrace();
 		}
-		return "The filename {" + filename + "} has been created";
 	}
 
-	/**
-	 * Return the contents of an image.
-	 */
-	@GET
-	@Path("/{filename}")
-	@Produces(MediaType.APPLICATION_OCTET_STREAM)
-	public byte[] download(@PathParam("filename") String filename) {
+	public byte[] download(String filename) {
 		byte[] arr = null;
 		try {
 			// Get container client.
