@@ -1,5 +1,7 @@
 package temppackage;
 
+import data_classes.Bid;
+
 import java.util.HashSet;
 import java.util.Set;
 

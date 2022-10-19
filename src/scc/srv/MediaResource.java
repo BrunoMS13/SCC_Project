@@ -2,6 +2,7 @@ package scc.srv;
 
 import jakarta.ws.rs.*;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import com.azure.core.util.BinaryData;
@@ -24,9 +25,8 @@ public class MediaResource
 	 * Post a new image.
 	 */
 	@POST
-	@Path("/")
 	@Consumes(MediaType.APPLICATION_OCTET_STREAM)
-	public void upload(byte[] contents, String filename) {
+	public String upload(byte[] contents, @QueryParam("filename") String filename) {
 		try {
 			BinaryData data = BinaryData.fromBytes(contents);
 
@@ -45,6 +45,7 @@ public class MediaResource
 		} catch( Exception e) {
 			e.printStackTrace();
 		}
+		return "The filename {" + filename + "} has been created";
 	}
 
 	/**
@@ -84,5 +85,13 @@ public class MediaResource
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<String> list() {
 		return new ArrayList<String>();
+	}
+
+	public static void main(String[] args) {
+		MediaResource mr = new MediaResource();
+		// If already exists, it throws exception.
+		//mr.upload("asdasdasd".getBytes(), "random");
+
+		System.out.println(new String(mr.download("cats.1.jpeg")));
 	}
 }
