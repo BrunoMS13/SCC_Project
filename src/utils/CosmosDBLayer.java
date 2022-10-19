@@ -11,6 +11,8 @@ import com.azure.cosmos.models.CosmosQueryRequestOptions;
 import com.azure.cosmos.models.PartitionKey;
 import com.azure.cosmos.util.CosmosPagedIterable;
 import data_classes.AuctionDAO;
+import data_classes.BidDAO;
+import data_classes.QuestionDAO;
 import data_classes.UserDAO;
 
 public class CosmosDBLayer {
@@ -120,7 +122,22 @@ public class CosmosDBLayer {
 
 	// ------------------------- Questions Methods ------------------------- //
 
+	public CosmosItemResponse<QuestionDAO> putQuestion(QuestionDAO question) {
+		init();
+		return questions.createItem(question);
+	}
+
+	public CosmosPagedIterable<QuestionDAO> getQuestions(String auctionId) {
+		init();
+		return questions.queryItems("SELECT * FROM questions WHERE questions.auctionId=\""+ auctionId + "\"", new CosmosQueryRequestOptions(), QuestionDAO.class);
+	}
+
 	// ------------------------- Bids Methods ------------------------- //
+
+	public CosmosPagedIterable<BidDAO> getBids(String auctionId) {
+		init();
+		return bids.queryItems("SELECT * FROM bids WHERE bids.auctionId=\"" + auctionId + "\"", new CosmosQueryRequestOptions(), BidDAO.class);
+	}
 
 	public void close() {
 		client.close();
