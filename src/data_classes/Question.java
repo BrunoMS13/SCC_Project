@@ -7,6 +7,7 @@ public class Question {
     private String questionBeingRespondedId;
     private String text;
 
+    public Question() {}
     public Question(String auctionId, String userId, String questionId, String questionBeingRespondedId, String text) {
         this.auctionId = auctionId;
         this.userId = userId;
