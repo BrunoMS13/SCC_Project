@@ -35,12 +35,31 @@ public class AuctionResource implements RestAuctions {
 
     @Override
     public void updateAuction(String id, String title, String description, String imageId, int endTime, int minPrice, String winnerId, String status) {
-
+        System.out.println("Updating auction with ID: '" + id +"'");
+        AuctionDAO auc = getAuction(id);
+        if (auc != null) {
+            if (!title.equals("")) auc.setTitle(title);
+            if (!description.equals("")) auc.setDescription(description);
+            if (!imageId.equals("")) auc.setImageId(imageId);
+            if (endTime > 0) auc.setEndingTime(endTime);
+            if (minPrice >= 0) auc.setMinPrice(minPrice);
+            if (!winnerId.equals("")) auc.setWinnerId(winnerId);
+            if (!status.equals("")) auc.setStatus(status);
+            db.updateAuction(auc);
+            System.out.println("Updated successfully.\n");
+        }else {
+                System.out.println("Did not update.\n");
+        }
     }
 
     public AuctionDAO getAuction(String id) {
-        CosmosPagedIterable<AuctionDAO> resGet = db.getAuctionById(id);
-        return resGet.iterator().next();
+        try {
+            CosmosPagedIterable<AuctionDAO> resGet = db.getAuctionById(id);
+            return resGet.iterator().next();
+        } catch (Exception e){
+            System.out.println("No acution with id '" + id +"' found.");
+            return null;
+        }
     }
 
     @Override
@@ -91,6 +110,7 @@ public class AuctionResource implements RestAuctions {
     public static void main(String[] args) {
 
         AuctionResource ar = new AuctionResource();
+        /*
         ar.createAuction("new_try","b","c","d","e",1,2);
         ar.createQuestion("new_try","aaabbba","adasd","asdasd");
         ar.createQuestion("new_try","aaddbba","adasd","asdasd");
@@ -104,5 +124,9 @@ public class AuctionResource implements RestAuctions {
         ar.listBids("new_try");
         ar.listQuestions("new_try");
         System.out.println("Over");
+        */
+        //ar.createAuction("to update","test","not updated","a","a",1,2);
+        ar.updateAuction("to update", "test_v2", "updated", "b", 1, 3, "winner", "");
+        ar.updateAuction("not exists", "test_v2", "updated", "b", 1, 3, "winner", "");
     }
 }

@@ -96,6 +96,12 @@ public class AuctionDAO {
     public String getStatus() {
         return this.status;
     }
+    public void setWinnerId(String winnerId) {
+        this.winnerId = winnerId;
+    }
+    public String getWinnerId() {
+        return this.winnerId;
+    }
 
     public void addBid(Bid bid) {bids.put(bid.getBidId(), bid);}
     public void addQuestion(Question question) {questions.put(question.getQuestionId(), question);}
