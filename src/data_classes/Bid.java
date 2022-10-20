@@ -6,6 +6,7 @@ public class Bid {
     private String bidId;
     private int bidValue;
 
+    public Bid() {}
     public Bid(String auctionId, String userId, String bidId, int bidValue) {
         this.auctionId = auctionId;
         this.userId = userId;

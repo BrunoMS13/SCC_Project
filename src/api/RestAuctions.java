@@ -1,16 +1,45 @@
 package api;
 
-import data_classes.BidDAO;
-import data_classes.QuestionDAO;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import data_classes.Bid;
+import data_classes.Question;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
-import utils.AuctionStatus;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.Enumeration;
 
 @Path("/auction")
 public interface RestAuctions {
     String ID = "id";
+    String TITLE = "title";
+    String IMAGEID = "imageId";
+    String OWNERID = "ownerId";
+    String ENDTIME = "endtime";
+    String MINPRICE = "minPrice";
+    String DESCRIPTION = "description";
+
+    /**
+     * Creates an auction along with the uploaded image.
+     * @param id - auction ID.
+     * @param title - auction title.
+     * @param description - auction description.
+     * @param imageId - auction image ID.
+     * @param ownerId - owner ID of the auction.
+     * @param endTime - auction end time.
+     * @param minPrice - auction min bid.
+     * @param photo - contents of the photo being uploaded.
+     */
+    @POST
+    @Consumes(MediaType.APPLICATION_OCTET_STREAM)
+    void createAuctionWithPhoto(@QueryParam(ID) String id,
+                                @QueryParam(TITLE) String title,
+                                @QueryParam(DESCRIPTION) String description,
+                                @QueryParam(IMAGEID) String imageId,
+                                @QueryParam(OWNERID) String ownerId,
+                                @QueryParam(ENDTIME) long endTime,
+                                @QueryParam(MINPRICE) int minPrice,
+                                byte[] photo);
 
     /**
      * Creates an auction.
@@ -24,7 +53,13 @@ public interface RestAuctions {
      */
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    void createAuction(String id, String title, String description, String imageId, String ownerId, long endTime, int minPrice);
+    void createAuction(@JsonProperty(ID) String id,
+                       @JsonProperty(TITLE) String title,
+                       @JsonProperty(DESCRIPTION) String description,
+                       @JsonProperty(IMAGEID) String imageId,
+                       @JsonProperty(OWNERID) String ownerId,
+                       @JsonProperty(ENDTIME) long endTime,
+                       @JsonProperty(MINPRICE) int minPrice);
 
     /**
      * Updates an auction.
@@ -39,7 +74,7 @@ public interface RestAuctions {
      */
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
-    void updateAuction(String id, String title, String description, String imageId, int endTime, int minPrice, String winnerId, AuctionStatus status);
+    void updateAuction(String id, String title, String description, String imageId, int endTime, int minPrice, String winnerId, String status);
 
     /**
      * Creates a bid for the respective auction ID.
@@ -61,7 +96,7 @@ public interface RestAuctions {
     @Path("/{" + ID + "}/bid")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    List<BidDAO> listBids(@PathParam(ID) String id);;
+    Collection<Bid> listBids(@PathParam(ID) String id);;
 
     /**
      * Creates a question.
@@ -95,5 +130,5 @@ public interface RestAuctions {
     @Path("/{" + ID + "}/question")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    List<QuestionDAO> listQuestions(@PathParam(ID) String id);
+    Collection<Question> listQuestions(@PathParam(ID) String id);
 }
