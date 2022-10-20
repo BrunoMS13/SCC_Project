@@ -30,7 +30,7 @@ public class AuctionDAO {
         this.ownerId = ownerId;
         this.imageId = imageId;
         this.minPrice = minPrice;
-        this.endingTime = endTime;
+        this.endingTime = System.currentTimeMillis() + endTime;
         this.status = "OPEN";
         this.bids = new HashMap<>();
         this.questions = new HashMap<>();
