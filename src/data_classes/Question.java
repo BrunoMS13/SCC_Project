@@ -26,4 +26,9 @@ public class Question {
     public String getQuestionId() {return this.questionId;}
     public String getQuestionBeingRespondedId() {return this.questionBeingRespondedId;}
     public String getText() {return this.text;}
+
+    @Override
+    public String toString() {
+        return "Question [Auction ID:" + getAuctionId() + ", User ID:" + getUserId() + ", Reply to question ID:" + getQuestionBeingRespondedId() + ", Text:" + getText() + "]";
+    }
 }

@@ -110,8 +110,7 @@ public class AuctionResource implements RestAuctions {
     public static void main(String[] args) {
 
         AuctionResource ar = new AuctionResource();
-        /*
-        ar.createAuction("new_try","b","c","d","e",1,2);
+        //ar.createAuction("new_try","b","c","d","e",1,2);
         ar.createQuestion("new_try","aaabbba","adasd","asdasd");
         ar.createQuestion("new_try","aaddbba","adasd","asdasd");
         ar.createQuestion("new_try","addbbba","adasd","asdasd");

@@ -25,7 +25,7 @@ public class Bid {
 
     @Override
     public String toString() {
-        return "Bid [Auction ID:" + getAuctionId() + ", User ID:" + getUserId() + ", Bid ID:" + getBidId() + ", Bid Value:" + getBidValue();
+        return "Bid [Auction ID:" + getAuctionId() + ", User ID:" + getUserId() + ", Bid ID:" + getBidId() + ", Bid Value:" + getBidValue() + "]";
     }
 }
 
