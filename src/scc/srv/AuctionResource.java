@@ -16,10 +16,12 @@ public class AuctionResource implements RestAuctions {
 
     private CosmosDBLayer db;
     private MediaResource mr;
+    private UserResource ur;
 
     public AuctionResource() {
         this.db = CosmosDBLayer.getInstance();
         this.mr = new MediaResource();
+        this.ur = new UserResource();
     }
 
     @Override
@@ -63,7 +65,11 @@ public class AuctionResource implements RestAuctions {
     }
 
     @Override
-    public void createBid(String id, String bidID, String bidderId, int bidValue) {
+    public void createBid(String id, String bidID, String bidderId, String password, int bidValue) {
+        if (id == null || bidID == null || bidderId == null) {System.out.println("There is a null string.");}
+        else if (bidValue <= 0) {System.out.println("Bid value must be above 0.");}
+        else if (ur.getUser(bidderId, password) == null) {System.out.println("Either user doesn't exist or password is mismatched");}
+
         AuctionDAO a = getAuction(id);
         a.addBid(new Bid(id, bidderId, bidID, bidValue));
         db.updateAuction(a);

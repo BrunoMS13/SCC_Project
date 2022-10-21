@@ -86,7 +86,7 @@ public interface RestAuctions {
     @Path("/{" + ID + "}/bid")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    void createBid(@PathParam(ID) String id, String bidID, String bidderId, int bidValue);
+    void createBid(@PathParam(ID) String id, String bidID, String bidderId, String password, int bidValue);
 
     /**
      * Lists all the bids for the auction with the respective ID.
