@@ -9,7 +9,6 @@ public class User {
 	private String pwd;
 	private String nickname;
 	private String photoId;
-	public User(UserDAO u) {this(u.getId(), u.getName(), u.getPwd(), u.getNickname(), u.getPhotoId());}
 	public User(String id, String name, String pwd, String nickname, String photoId) {
 		super();
 		this.id = id;
