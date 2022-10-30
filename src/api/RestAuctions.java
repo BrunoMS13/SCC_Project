@@ -51,14 +51,7 @@ public interface RestAuctions {
 
     /**
      * Updates an auction.
-     * @param id - new auction ID.
-     * @param title - new auction title.
-     * @param description - new auction description.S
-     * @param imageId - new image ID.
-     * @param endTime - new end time.
-     * @param minPrice - auction min price for bid.
-     * @param winnerId - winner of the auction.
-     * @param status - current status of the auction
+     * @param auction - auction being updated.
      */
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
@@ -103,7 +96,7 @@ public interface RestAuctions {
      * @param question - created question.
      */
     @Path("/{" + ID + "}/question")
-    @PUT
+    @POST
     @Consumes(MediaType.APPLICATION_JSON)
     void replyToQuestion(@PathParam(ID) String id, @QueryParam(PASSWORD) String password, Question question);
 
