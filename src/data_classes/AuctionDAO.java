@@ -103,14 +103,17 @@ public class AuctionDAO {
         return this.winnerId;
     }
 
-    public void addBid(Bid bid) {bids.put(bid.getBidId(), bid);}
+    public void addBid(Bid bid) {
+        bids.put(bid.getBidId(), bid);
+        minPrice = bid.getBidValue();
+    }
     public void addQuestion(Question question) {questions.put(question.getQuestionId(), question);}
 
     public Map<String, Bid> getBids() {return this.bids;}
     public Map<String, Question> getQuestions() {return this.questions;}
     @Override
     public String toString() {
-        return "Auction [title=" + this.title + " ownerId=" + this.ownerId + " status=" + this.status + "]";
+        return "Auction [title=" + this.title + " ownerId=" + this.ownerId + " status=" + this.status +  " minBid=" + this.minPrice + "]";
     }
 
 }

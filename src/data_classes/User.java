@@ -9,6 +9,7 @@ public class User {
 	private String pwd;
 	private String nickname;
 	private String photoId;
+	public User() {}
 	public User(String id, String name, String pwd, String nickname, String photoId) {
 		super();
 		this.id = id;

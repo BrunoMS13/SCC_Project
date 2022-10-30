@@ -18,6 +18,7 @@ public class Auction {
 
     private String status;
 
+    public Auction() {}
     public Auction(String id, String title, String description, String imageId, String ownerId, long endTime, int minPrice) {
         this.id = id;
         this.title = title;

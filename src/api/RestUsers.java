@@ -2,7 +2,6 @@ package api;
 
 import data_classes.User;
 import jakarta.ws.rs.core.MediaType;
-import data_classes.UserDAO;
 
 import javax.ws.rs.*;
 
@@ -11,15 +10,11 @@ public interface RestUsers {
     String ID = "id";
     String PASSWORD = "password";
 
-    @POST
-    @Path("/")
-    @Consumes() // TODO Consumes
-    void createUserWithPhoto(User user, byte[] photo) throws WebApplicationException;
+    //void createUserWithPhoto(User user, byte[] photo) throws WebApplicationException;
 
     @POST
-    @Path("/")
     @Consumes(MediaType.APPLICATION_JSON)
-    void createUser(User user) throws WebApplicationException;
+    void createUser(User user); //throws WebApplicationException;
 
     @DELETE
     @Path("/{id}")
