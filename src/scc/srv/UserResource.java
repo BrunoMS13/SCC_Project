@@ -3,15 +3,22 @@ package scc.srv;
 import api.RestUsers;
 import com.azure.cosmos.util.CosmosPagedIterable;
 import data_classes.User;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
 import utils.CosmosDBLayer;
 import data_classes.UserDAO;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Iterator;
 
 
-public class UserResource implements RestUsers {
+@Path("/user")
+public class UserResource {
 
     private CosmosDBLayer db;
     private MediaResource mr;
@@ -21,17 +28,18 @@ public class UserResource implements RestUsers {
         this.mr = new MediaResource();
     }
 
-    public void createUserWithPhoto(User user, byte[] photo) throws WebApplicationException {
+    public void createUserWithPhoto(User user, byte[] photo) {//throws WebApplicationException {
         System.out.println("Creating user with photo...");
-        if (badUser(user))
-            throw new WebApplicationException(Response.Status.BAD_REQUEST);
-        if (getUserHelper(user.getId()) != null)
-            throw new WebApplicationException(Response.Status.CONFLICT);
+        //if (badUser(user))
+        //    throw new WebApplicationException(Response.Status.BAD_REQUEST);
+        //if (getUserHelper(user.getId()) != null)
+        //    throw new WebApplicationException(Response.Status.CONFLICT);
         mr.upload(photo, user.getPhotoId());
         db.putUser(new UserDAO(user));
     }
 
-    @Override
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
     public void createUser(User user) throws WebApplicationException {
         System.out.println("Creating user...");
         if (badUser(user))
@@ -41,14 +49,12 @@ public class UserResource implements RestUsers {
         db.putUser(new UserDAO(user));
     }
 
-    @Override
     public void deleteUser(String id, String password) throws WebApplicationException {
         System.out.println("Deleting user...");
         User user = getUser(id, password);
         db.delUser(new UserDAO(user));
     }
 
-    @Override
     public void updateUser(String id, String password, User user) throws WebApplicationException {
         System.out.println("Updating user...");
         User u = getUser(id, password);
@@ -57,7 +63,6 @@ public class UserResource implements RestUsers {
         db.updateUser(new UserDAO(user));
     }
 
-    @Override
     public User getUser(String id, String password) throws WebApplicationException {
         if (badParam(id))
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
@@ -99,7 +104,7 @@ public class UserResource implements RestUsers {
 
         System.out.println(ur.getUser("addd25", "c"));
 
-        ur.deleteUser("addd25", "c");
+        //ur.deleteUser("addd25", "c");
 
         System.out.println("Over...");
 
