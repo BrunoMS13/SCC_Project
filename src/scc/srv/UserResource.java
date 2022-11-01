@@ -1,6 +1,7 @@
 package scc.srv;
 
 import api.RestUsers;
+import com.azure.cosmos.models.CosmosItemResponse;
 import com.azure.cosmos.util.CosmosPagedIterable;
 import data_classes.User;
 import jakarta.ws.rs.Consumes;
@@ -8,6 +9,7 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import utils.CosmosDBLayer;
 import data_classes.UserDAO;
+import utils.RedisLayer;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
@@ -15,6 +17,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Iterator;
+import java.util.Set;
 
 
 @Path("/user")
@@ -22,10 +25,12 @@ public class UserResource {
 
     private CosmosDBLayer db;
     private MediaResource mr;
+    private RedisLayer rl;
 
     public UserResource() {
         this.db = CosmosDBLayer.getInstance();
         this.mr = new MediaResource();
+        this.rl = RedisLayer.getInstance();
     }
 
     public void createUserWithPhoto(User user, byte[] photo) {//throws WebApplicationException {
@@ -46,13 +51,19 @@ public class UserResource {
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
         if (getUserHelper(user.getId()) != null)
             throw new WebApplicationException(Response.Status.CONFLICT);
-        db.putUser(new UserDAO(user));
+        // add to database
+        CosmosItemResponse<UserDAO> udao = db.putUser(new UserDAO(user));
+        // add to cache
+        rl.addUser(udao.getItem());
     }
 
     public void deleteUser(String id, String password) throws WebApplicationException {
         System.out.println("Deleting user...");
         User user = getUser(id, password);
+        // delete from database
         db.delUser(new UserDAO(user));
+        // delete from cache
+        rl.deleteUser(id);
     }
 
     public void updateUser(String id, String password, User user) throws WebApplicationException {
@@ -60,7 +71,10 @@ public class UserResource {
         User u = getUser(id, password);
         if (!u.getId().equals(user.getId()))
             throw new WebApplicationException(Response.Status.NOT_ACCEPTABLE);
-        db.updateUser(new UserDAO(user));
+        // update database
+        CosmosItemResponse<UserDAO> udao = db.updateUser(new UserDAO(user));
+        // update cache
+        rl.updateUser(udao.getItem());
     }
 
     public User getUser(String id, String password) throws WebApplicationException {
@@ -75,6 +89,10 @@ public class UserResource {
     }
 
     private UserDAO getUserHelper(String id) {
+        // try through cache
+        UserDAO user = rl.getUser(id);
+        if (user != null) return user;
+        // try through database
         CosmosPagedIterable<UserDAO> resGet = db.getUserById(id);
         Iterator<UserDAO> it = resGet.iterator();
         if (!it.hasNext()) return null;
@@ -92,19 +110,38 @@ public class UserResource {
         return !user.getPwd().equals(password);
     }
 
+    private void printRedisContents() {
+        rl.printContents();
+    }
+
+    private void clearRedis() {
+        rl.clearCache();
+    }
+
     public static void main(String[] args) {
 
         UserResource ur = new UserResource();
 
-        ur.createUser(new User("addd25","b","c12312asdasd","d", "e"));
+        ur.clearRedis();
 
-        System.out.println(ur.getUser("addd25", "c12312asdasd"));
+        ur.createUser(new User("123","b","c12312asdasd","d", "e"));
+        ur.createUser(new User("234","oldname","c12312asdasd","d", "e"));
 
-        ur.updateUser("addd25", "c12312asdasd", new User("addd25", "c12312asdasd", "c", "afdsa", "das"));
+        ur.printRedisContents();
 
-        System.out.println(ur.getUser("addd25", "c"));
+        System.out.println(ur.getUser("123", "c12312asdasd"));
 
-        //ur.deleteUser("addd25", "c");
+        ur.updateUser("234", "c12312asdasd", new User("234", "newname", "c12312asdasd", "afdsa", "das"));
+
+        System.out.println(ur.getUser("234", "c12312asdasd"));
+
+        ur.deleteUser("123", "c12312asdasd");
+
+        ur.printRedisContents();
+
+        ur.deleteUser("234", "c12312asdasd");
+
+        ur.printRedisContents();
 
         System.out.println("Over...");
 

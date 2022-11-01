@@ -1,10 +1,12 @@
 package scc.srv;
 
 import api.RestAuctions;
+import com.azure.cosmos.models.CosmosItemResponse;
 import com.azure.cosmos.util.CosmosPagedIterable;
 import data_classes.*;
 import javax.ws.rs.WebApplicationException;
 import utils.CosmosDBLayer;
+import utils.RedisLayer;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -21,17 +23,20 @@ public class AuctionResource implements RestAuctions {
     private CosmosDBLayer db;
     private MediaResource mr;
     private UserResource ur;
+    private RedisLayer rl;
 
     public AuctionResource() {
         this.db = CosmosDBLayer.getInstance();
         this.mr = new MediaResource();
         this.ur = new UserResource();
+        this.rl = RedisLayer.getInstance();
     }
 
     @Override
     public void createAuctionWithPhoto(String id, String title, String description, String imageId, String ownerId, long endTime, int minPrice, byte[] photo) {
         mr.upload(photo, imageId);
-        db.putAuction(new AuctionDAO(id,title,description,imageId,ownerId,endTime,minPrice));
+        CosmosItemResponse<AuctionDAO> aucDAO = db.putAuction(new AuctionDAO(id,title,description,imageId,ownerId,endTime,minPrice));
+        rl.addAuction(aucDAO.getItem());
     }
 
     @Override
@@ -41,7 +46,8 @@ public class AuctionResource implements RestAuctions {
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
         if (getAuctionHelper(auction.getId()) != null)
             throw new WebApplicationException(Response.Status.CONFLICT);
-        db.putAuction(new AuctionDAO(auction));
+        CosmosItemResponse<AuctionDAO> aucDAO = db.putAuction(new AuctionDAO(auction));
+        rl.addAuction(aucDAO.getItem());
     }
 
     @Override
@@ -50,7 +56,8 @@ public class AuctionResource implements RestAuctions {
         AuctionDAO auc = getAuction(auction.getId());
         if (!auc.getId().equals(auction.getId()))
             throw new WebApplicationException(Response.Status.NOT_ACCEPTABLE);
-        db.updateAuction(new AuctionDAO(auction));
+        CosmosItemResponse<AuctionDAO> aucdao = db.updateAuction(new AuctionDAO(auction));
+        rl.updateAuction(aucdao.getItem());
     }
 
     public AuctionDAO getAuction(String id) throws WebApplicationException {
@@ -113,10 +120,15 @@ public class AuctionResource implements RestAuctions {
     }
 
     private AuctionDAO getAuctionHelper(String id) {
+        // try through cache
+        AuctionDAO temp = rl.getAuction(id);
+        if (temp != null)
+            return temp;
+        // try through database
         CosmosPagedIterable<AuctionDAO> resGet = db.getAuctionById(id);
         Iterator<AuctionDAO> it = resGet.iterator();
         if (!it.hasNext()) return null;
-        AuctionDAO temp = resGet.iterator().next();
+        temp = resGet.iterator().next();
         return temp;
     }
 
@@ -128,16 +140,41 @@ public class AuctionResource implements RestAuctions {
         return auction == null || badParam(auction.getId()) || badParam(auction.getDescription()) || badParam(auction.getImageId()) || badParam(auction.getOwnerId()) || badParam(auction.getTitle()) || badNumber(auction.getMinPrice()) || badNumber(auction.getEndingTime());
     }
 
+    private void printRedisContents() {
+        rl.printContents();
+    }
+
+    private void clearRedis() {
+        rl.clearCache();
+    }
+
     public static void main(String[] args) {
 
         AuctionResource ar = new AuctionResource();
+        UserResource ur = new UserResource();
 
-        //ar.createAuction(new Auction("a","b","c","c","c",100000,1000));
+        ar.clearRedis();
+
+        ur.createUser(new User("123","b","c12312asdasd","d", "e"));
+
+        ar.printRedisContents();
+
+        ar.createAuction(new Auction("a","oldtitle","c","c","c",100000,1000));
+
+        ar.printRedisContents();
+
+        ur.deleteUser("123", "c12312asdasd");
+
+        ar.updateAuction(new Auction("a","newtitle","c","c","c",100000,1000));
+
+        ar.printRedisContents();
 
         //System.out.println(ar.getAuction("a").toString());
 
-        ar.createBid("a", "cc", new Bid("aaaa", "aaaa", 800300));
+        //ar.createBid("a", "cc", new Bid("aaaa", "aaaa", 800300));
 
         System.out.println(ar.getAuction("a").toString());
+
+        System.out.println("Finished...");
     }
 }
