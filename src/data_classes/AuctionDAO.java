@@ -1,8 +1,6 @@
 package data_classes;
 
-import utils.AuctionStatus;
-
-import java.util.HashSet;
+import java.util.*;
 
 public class AuctionDAO {
     private String _rid;
@@ -15,9 +13,16 @@ public class AuctionDAO {
     private String imageId;
     private int minPrice;
     private long endingTime;
+    private Map<String, Bid> bids;
+    private Map<String, Question> questions;
 
-    private AuctionStatus status;
+    private String status;
 
+    public AuctionDAO() {
+    }
+    public AuctionDAO(Auction a) {
+        this(a.getId(), a.getTitle(), a.getDescription(), a.getImageId(), a.getOwnerId(), a.getEndingTime(), a.getMinPrice());
+    }
     public AuctionDAO(String id, String title, String description, String imageId, String ownerId, long endTime, int minPrice) {
         this.id = id;
         this.title = title;
@@ -25,9 +30,12 @@ public class AuctionDAO {
         this.ownerId = ownerId;
         this.imageId = imageId;
         this.minPrice = minPrice;
-        this.endingTime = endTime;
-        this.status = AuctionStatus.OPEN;
+        this.endingTime = System.currentTimeMillis() + endTime;
+        this.status = "OPEN";
+        this.bids = new HashMap<>();
+        this.questions = new HashMap<>();
     }
+
     public String get_rid() {
         return _rid;
     }
@@ -82,15 +90,30 @@ public class AuctionDAO {
     public long getEndingTime() {
         return this.endingTime;
     }
-    public void setStatus(AuctionStatus status) {
+    public void setStatus(String status) {
         this.status = status;
     }
-    public AuctionStatus getStatus() {
+    public String getStatus() {
         return this.status;
     }
+    public void setWinnerId(String winnerId) {
+        this.winnerId = winnerId;
+    }
+    public String getWinnerId() {
+        return this.winnerId;
+    }
+
+    public void addBid(Bid bid) {
+        bids.put(bid.getBidId(), bid);
+        minPrice = bid.getBidValue();
+    }
+    public void addQuestion(Question question) {questions.put(question.getQuestionId(), question);}
+
+    public Map<String, Bid> getBids() {return this.bids;}
+    public Map<String, Question> getQuestions() {return this.questions;}
     @Override
     public String toString() {
-        return "Auction [title=" + this.title + " ownerId=" + this.ownerId + " status=" + this.status + "]";
+        return "Auction [title=" + this.title + " ownerId=" + this.ownerId + " status=" + this.status +  " minBid=" + this.minPrice + "]";
     }
 
 }

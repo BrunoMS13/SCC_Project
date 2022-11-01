@@ -1,19 +1,26 @@
 package api;
 
-import data_classes.BidDAO;
-import data_classes.QuestionDAO;
+import data_classes.Auction;
+import data_classes.Bid;
+import data_classes.Question;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
-import utils.AuctionStatus;
 
-import java.util.List;
+import java.util.Collection;
 
 @Path("/auction")
 public interface RestAuctions {
     String ID = "id";
+    String TITLE = "title";
+    String IMAGEID = "imageId";
+    String OWNERID = "ownerId";
+    String ENDTIME = "endtime";
+    String MINPRICE = "minPrice";
+    String PASSWORD = "password";
+    String DESCRIPTION = "description";
 
     /**
-     * Creates an auction.
+     * Creates an auction along with the uploaded image.
      * @param id - auction ID.
      * @param title - auction title.
      * @param description - auction description.
@@ -21,37 +28,45 @@ public interface RestAuctions {
      * @param ownerId - owner ID of the auction.
      * @param endTime - auction end time.
      * @param minPrice - auction min bid.
+     * @param photo - contents of the photo being uploaded.
+     */
+    @POST
+    @Consumes(MediaType.APPLICATION_OCTET_STREAM)
+    void createAuctionWithPhoto(@QueryParam(ID) String id,
+                                @QueryParam(TITLE) String title,
+                                @QueryParam(DESCRIPTION) String description,
+                                @QueryParam(IMAGEID) String imageId,
+                                @QueryParam(OWNERID) String ownerId,
+                                @QueryParam(ENDTIME) long endTime,
+                                @QueryParam(MINPRICE) int minPrice,
+                                byte[] photo);
+
+    /**
+     * Creates an auction.
+     * @param auction - auction being created.
      */
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    void createAuction(String id, String title, String description, String imageId, String ownerId, long endTime, int minPrice);
+    void createAuction(Auction auction);
 
     /**
      * Updates an auction.
-     * @param id - new auction ID.
-     * @param title - new auction title.
-     * @param description - new auction description.S
-     * @param imageId - new image ID.
-     * @param endTime - new end time.
-     * @param minPrice - auction min price for bid.
-     * @param winnerId - winner of the auction.
-     * @param status - current status of the auction
+     * @param auction - auction being updated.
      */
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
-    void updateAuction(String id, String title, String description, String imageId, int endTime, int minPrice, String winnerId, AuctionStatus status);
+    void updateAuction(Auction auction);
 
     /**
      * Creates a bid for the respective auction ID.
      * @param id - auction ID.
-     * @param bidID - bid ID.
-     * @param bidderId - bidder user ID.
-     * @param bidValue - bid amount.
+     * @param password - user password.
+     * @param bid - created bid.
      */
     @Path("/{" + ID + "}/bid")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    void createBid(@PathParam(ID) String id, String bidID, String bidderId, int bidValue);
+    void createBid(@PathParam(ID) String id, @QueryParam(PASSWORD) String password, Bid bid);
 
     /**
      * Lists all the bids for the auction with the respective ID.
@@ -61,31 +76,29 @@ public interface RestAuctions {
     @Path("/{" + ID + "}/bid")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    List<BidDAO> listBids(@PathParam(ID) String id);;
+    Collection<Bid> listBids(@PathParam(ID) String id);;
 
     /**
      * Creates a question.
      * @param id - auction ID.
-     * @param questionId - question ID.
-     * @param userId - owner of the question ID.
-     * @param text - question text.
+     * @param password - user password.
+     * @param question - created question.
      */
     @Path("/{" + ID + "}/question")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    void createQuestion(@PathParam(ID) String id, String questionId, String userId, String text);
+    void createQuestion(@PathParam(ID) String id, @QueryParam(PASSWORD) String password, Question question);
 
     /**
      * Update question replies.
      * @param id - auction ID.
-     * @param questionId - question ID.
-     * @param userId - replier ID.
-     * @param text - reply text.
+     * @param password - user password.
+     * @param question - created question.
      */
     @Path("/{" + ID + "}/question")
-    @PUT
+    @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    void replyToQuestion(@PathParam(ID) String id, String questionId, String userId, String questionBeingRespondedId, String text);
+    void replyToQuestion(@PathParam(ID) String id, @QueryParam(PASSWORD) String password, Question question);
 
     /**
      * Lists all the questions to the respective auction ID.
@@ -95,5 +108,5 @@ public interface RestAuctions {
     @Path("/{" + ID + "}/question")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    List<QuestionDAO> listQuestions(@PathParam(ID) String id);
+    Collection<Question> listQuestions(@PathParam(ID) String id);
 }
