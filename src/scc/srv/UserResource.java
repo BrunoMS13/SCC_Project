@@ -3,12 +3,10 @@ package scc.srv;
 import api.RestUsers;
 import com.azure.cosmos.models.CosmosItemResponse;
 import com.azure.cosmos.util.CosmosPagedIterable;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import data_classes.User;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
-import redis.clients.jedis.Jedis;
 import utils.CosmosDBLayer;
 import data_classes.UserDAO;
 import utils.RedisLayer;
@@ -32,7 +30,7 @@ public class UserResource {
     public UserResource() {
         this.db = CosmosDBLayer.getInstance();
         this.mr = new MediaResource();
-        this.rl = new RedisLayer();
+        this.rl = RedisLayer.getInstance();
     }
 
     public void createUserWithPhoto(User user, byte[] photo) {//throws WebApplicationException {

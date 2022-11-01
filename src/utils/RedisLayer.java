@@ -1,6 +1,7 @@
 package utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import data_classes.AuctionDAO;
 import data_classes.UserDAO;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -13,9 +14,11 @@ public class RedisLayer {
     private static final String RedisHostname = "scc23cache-58569.redis.cache.windows.net";
     private static final String RedisKey = "VQZ6deAFTRCoIC4uuO8596JA4f6JuoNL3AzCaDEns1g=";
 
-    private static JedisPool instance;
+    private static JedisPool pool;
 
-    public synchronized static JedisPool getInstance() {
+    private static RedisLayer instance;
+
+    public synchronized static RedisLayer getInstance() {
         if( instance != null)
             return instance;
         final JedisPoolConfig poolConfig = new JedisPoolConfig();
@@ -27,13 +30,19 @@ public class RedisLayer {
         poolConfig.setTestWhileIdle(true);
         poolConfig.setNumTestsPerEvictionRun(3);
         poolConfig.setBlockWhenExhausted(true);
-        instance = new JedisPool(poolConfig, RedisHostname, 6380, 1000, RedisKey, true);
+        JedisPool jp = new JedisPool(poolConfig, RedisHostname, 6380, 1000, RedisKey, true);
+        instance = new RedisLayer(jp);
         return instance;
 
     }
 
+    public RedisLayer(JedisPool jp) {
+        this.pool = jp;
+    }
+
+
     public void addUser(UserDAO user) {
-        try (Jedis jedis = RedisLayer.getInstance().getResource()){
+        try (Jedis jedis = pool.getResource()){
             ObjectMapper mapper = new ObjectMapper();
             String key = "users:" + user.getId();
             jedis.hset(key, "user", mapper.writeValueAsString(user));
@@ -44,7 +53,7 @@ public class RedisLayer {
     }
 
     public void updateUser(UserDAO user) {
-        try (Jedis jedis = RedisLayer.getInstance().getResource()) {
+        try (Jedis jedis = pool.getResource()) {
             ObjectMapper mapper = new ObjectMapper();
             String key = "users:" + user.getId();
             jedis.hset(key, "user", mapper.writeValueAsString(user));
@@ -54,7 +63,7 @@ public class RedisLayer {
     }
 
     public void deleteUser(String id) {
-        try (Jedis jedis = RedisLayer.getInstance().getResource()){
+        try (Jedis jedis = pool.getResource()){
             String key = "users:" + id;
             jedis.del(key);
         } catch (Exception e) {
@@ -63,7 +72,7 @@ public class RedisLayer {
     }
 
     public UserDAO getUser(String id) {
-        try (Jedis jedis = RedisLayer.getInstance().getResource()) {
+        try (Jedis jedis = pool.getResource()) {
             ObjectMapper mapper = new ObjectMapper();
             String key = "users:" + id;
             String res = jedis.hget(key, "user");
@@ -76,12 +85,47 @@ public class RedisLayer {
         return null;
     }
 
+    public void addAuction(AuctionDAO auc) {
+        try (Jedis jedis = pool.getResource()){
+            ObjectMapper mapper = new ObjectMapper();
+            String key = "auctions:" + auc.getId();
+            jedis.hset(key, "auction", mapper.writeValueAsString(auc));
+        } catch (Exception e) {
+            System.out.println("Could not add auction to cache...");
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void updateAuction(AuctionDAO auction) {
+        try (Jedis jedis = pool.getResource()) {
+            ObjectMapper mapper = new ObjectMapper();
+            String key = "auctions:" + auction.getId();
+            jedis.hset(key, "auction", mapper.writeValueAsString(auction));
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    public AuctionDAO getAuction(String id) {
+        try (Jedis jedis = pool.getResource()) {
+            ObjectMapper mapper = new ObjectMapper();
+            String key = "auctions:" + id;
+            String res = jedis.hget(key, "auction");
+            AuctionDAO temp = mapper.readValue(res, AuctionDAO.class);
+            if (temp != null)
+                return temp;
+        } catch (Exception e) {
+
+        }
+        return null;
+    }
+
     public void printContents() {
         System.out.println("Redis contents:");
-        try (Jedis jedis = RedisLayer.getInstance().getResource()) {
-            Set<String> keys = jedis.keys("users:*");
+        try (Jedis jedis = pool.getResource()) {
+            Set<String> keys = jedis.keys("*");
             for (String key : keys) {
-                System.out.println(jedis.hget(key, "user"));
+                System.out.println(jedis.hgetAll(key));
             }
         } catch (Exception e) {
         }
@@ -89,8 +133,8 @@ public class RedisLayer {
     }
 
     public void clearCache() {
-        try (Jedis jedis = RedisLayer.getInstance().getResource()) {
-            Set<String> keys = jedis.keys("users:*");
+        try (Jedis jedis = pool.getResource()) {
+            Set<String> keys = jedis.keys("*");
             for (String key : keys) {
                 jedis.del(key);
             }
