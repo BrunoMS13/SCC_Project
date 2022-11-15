@@ -4,13 +4,14 @@ import api.RestAuctions;
 import com.azure.cosmos.models.CosmosItemResponse;
 import com.azure.cosmos.util.CosmosPagedIterable;
 import data_classes.*;
-import javax.ws.rs.WebApplicationException;
+
+import javax.ws.rs.*;
+
+import jakarta.ws.rs.NotAuthorizedException;
+import jakarta.ws.rs.core.Cookie;
 import utils.CosmosDBLayer;
 import utils.RedisLayer;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Collection;
@@ -40,19 +41,33 @@ public class AuctionResource implements RestAuctions {
     }
 
     @Override
-    public void createAuction(Auction auction) throws WebApplicationException {
+    public void createAuction(Cookie session, Auction auction) throws WebApplicationException {
         System.out.println("Creating auction...");
-        if (badAuction(auction))
-            throw new WebApplicationException(Response.Status.BAD_REQUEST);
-        if (getAuctionHelper(auction.getId()) != null)
-            throw new WebApplicationException(Response.Status.CONFLICT);
-        CosmosItemResponse<AuctionDAO> aucDAO = db.putAuction(new AuctionDAO(auction));
-        rl.addAuction(aucDAO.getItem());
+        try {
+            // checking that auction is correct and can be created
+            if (badAuction(auction))
+                throw new WebApplicationException(Response.Status.BAD_REQUEST);
+            if (getAuctionHelper(auction.getId()) != null)
+                throw new WebApplicationException(Response.Status.CONFLICT);
+
+            // checking cookies
+            checkCookieUser(session, auction.getOwnerId());
+
+            // creating auction
+            CosmosItemResponse<AuctionDAO> aucDAO = db.putAuction(new AuctionDAO(auction));
+            rl.addAuction(aucDAO.getItem());
+
+        } catch (WebApplicationException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new InternalServerErrorException(e);
+        }
     }
 
     @Override
-    public void updateAuction(Auction auction) throws WebApplicationException {
+    public void updateAuction(Cookie session, Auction auction) throws WebApplicationException {
         System.out.println("Updating auction...");
+        checkCookieUser(session, auction.getOwnerId());
         AuctionDAO auc = getAuction(auction.getId());
         if (!auc.getId().equals(auction.getId()))
             throw new WebApplicationException(Response.Status.NOT_ACCEPTABLE);
@@ -68,7 +83,8 @@ public class AuctionResource implements RestAuctions {
     }
 
     @Override
-    public void createBid(String id, String password, Bid bid) throws WebApplicationException {
+    public void createBid(Cookie session, String id, String password, Bid bid) throws WebApplicationException {
+        checkCookieUser(session, bid.getUserId());
         AuctionDAO auc = getAuction(id);
         ur.getUser(bid.getUserId(), password);
         if (badParam(bid.getBidId()) || bid.getBidValue() < auc.getMinPrice())
@@ -88,7 +104,8 @@ public class AuctionResource implements RestAuctions {
     }
 
     @Override
-    public void createQuestion(String id, String password, Question question) throws WebApplicationException {
+    public void createQuestion(Cookie session, String id, String password, Question question) throws WebApplicationException {
+        checkCookieUser(session, question.getUserId());
         AuctionDAO auc = getAuction(id);
         ur.getUser(question.getUserId(), password);
         if (badParam(question.getQuestionId()) || badParam(question.getText()))
@@ -100,13 +117,14 @@ public class AuctionResource implements RestAuctions {
     }
 
     @Override
-    public void replyToQuestion(String id, String password, Question question) throws WebApplicationException {
+    public void replyToQuestion(Cookie session, String id, String password, Question question) throws WebApplicationException {
+        checkCookieUser(session, question.getUserId());
         AuctionDAO auc = getAuction(id);
         if (badParam(question.getQuestionBeingRespondedId()))
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
         if (!auc.getQuestions().keySet().contains(question.getQuestionBeingRespondedId()))
             throw new WebApplicationException(Response.Status.NOT_FOUND);
-        createQuestion(id, password, question);
+        createQuestion(session, id, password, question);
     }
 
     @Override
@@ -117,6 +135,22 @@ public class AuctionResource implements RestAuctions {
             System.out.println(question);
         }
         return auc.getQuestions().values();
+    }
+
+    public Session checkCookieUser(Cookie session, String id) throws NotAuthorizedException {
+        if (session == null || session.getValue() == null)
+            throw new NotAuthorizedException("No session initialized");
+        Session s;
+        try {
+            s = rl.getSession(session.getValue());
+        } catch (Exception e) {
+            throw new NotAuthorizedException("");
+        }
+        if (s == null || s.getUser() == null || s.getUser().length() == 0)
+            throw new NotAuthorizedException("No valid session initialized");
+        if (!s.getUser().equals(id) && !s.getUser().equals("admim"))
+            throw new NotAuthorizedException("Invalid user : " + s.getUser());
+        return s;
     }
 
     private AuctionDAO getAuctionHelper(String id) {
@@ -149,7 +183,7 @@ public class AuctionResource implements RestAuctions {
     }
 
     public static void main(String[] args) {
-
+        /*
         AuctionResource ar = new AuctionResource();
         UserResource ur = new UserResource();
 
@@ -176,5 +210,6 @@ public class AuctionResource implements RestAuctions {
         System.out.println(ar.getAuction("a").toString());
 
         System.out.println("Finished...");
+        */
     }
 }

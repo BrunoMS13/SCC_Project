@@ -1,7 +1,9 @@
 package api;
 
+import data_classes.Login;
 import data_classes.User;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 import javax.ws.rs.*;
 
@@ -30,4 +32,11 @@ public interface RestUsers {
     @Path("/{id}")
     @Consumes(MediaType.TEXT_PLAIN)
     User getUser(@PathParam(ID) String id, @QueryParam(PASSWORD) String password) throws WebApplicationException;
+
+    @POST
+    @Path("/auth")
+    @Consumes(MediaType.APPLICATION_JSON)
+    Response auth(Login login);
+
+
 }

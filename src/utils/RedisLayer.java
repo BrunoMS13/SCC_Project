@@ -2,6 +2,8 @@ package utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import data_classes.AuctionDAO;
+import data_classes.Login;
+import data_classes.Session;
 import data_classes.UserDAO;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -112,6 +114,31 @@ public class RedisLayer {
             String key = "auctions:" + id;
             String res = jedis.hget(key, "auction");
             AuctionDAO temp = mapper.readValue(res, AuctionDAO.class);
+            if (temp != null)
+                return temp;
+        } catch (Exception e) {
+
+        }
+        return null;
+    }
+
+    public void addSession(Session session) {
+        try (Jedis jedis = pool.getResource()){
+            ObjectMapper mapper = new ObjectMapper();
+            String key = "sessions:" + session.getUser();
+            jedis.hset(key, "session", mapper.writeValueAsString(session));
+        } catch (Exception e) {
+            System.out.println("Could not add session to cache...");
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public Session getSession(String id) {
+        try (Jedis jedis = pool.getResource()) {
+            ObjectMapper mapper = new ObjectMapper();
+            String key = "sessions:" + id;
+            String res = jedis.hget(key, "session");
+            Session temp = mapper.readValue(res, Session.class);
             if (temp != null)
                 return temp;
         } catch (Exception e) {
