@@ -4,6 +4,7 @@ import data_classes.Auction;
 import data_classes.Bid;
 import data_classes.Question;
 import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Cookie;
 import jakarta.ws.rs.core.MediaType;
 
 import java.util.Collection;
@@ -47,7 +48,8 @@ public interface RestAuctions {
      */
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    void createAuction(Auction auction);
+    @Produces(MediaType.APPLICATION_JSON)
+    void createAuction(@CookieParam("scc:session") Cookie session, Auction auction);
 
     /**
      * Updates an auction.
@@ -55,7 +57,7 @@ public interface RestAuctions {
      */
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
-    void updateAuction(Auction auction);
+    void updateAuction(@CookieParam("scc:session") Cookie session, Auction auction);
 
     /**
      * Creates a bid for the respective auction ID.
@@ -66,7 +68,7 @@ public interface RestAuctions {
     @Path("/{" + ID + "}/bid")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    void createBid(@PathParam(ID) String id, @QueryParam(PASSWORD) String password, Bid bid);
+    void createBid(@CookieParam("scc:session") Cookie session, @PathParam(ID) String id, @QueryParam(PASSWORD) String password, Bid bid);
 
     /**
      * Lists all the bids for the auction with the respective ID.
@@ -87,7 +89,7 @@ public interface RestAuctions {
     @Path("/{" + ID + "}/question")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    void createQuestion(@PathParam(ID) String id, @QueryParam(PASSWORD) String password, Question question);
+    void createQuestion(@CookieParam("scc:session") Cookie session, @PathParam(ID) String id, @QueryParam(PASSWORD) String password, Question question);
 
     /**
      * Update question replies.
@@ -98,7 +100,7 @@ public interface RestAuctions {
     @Path("/{" + ID + "}/question")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    void replyToQuestion(@PathParam(ID) String id, @QueryParam(PASSWORD) String password, Question question);
+    void replyToQuestion(@CookieParam("scc:session") Cookie session, @PathParam(ID) String id, @QueryParam(PASSWORD) String password, Question question);
 
     /**
      * Lists all the questions to the respective auction ID.

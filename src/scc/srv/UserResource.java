@@ -3,10 +3,15 @@ package scc.srv;
 import api.RestUsers;
 import com.azure.cosmos.models.CosmosItemResponse;
 import com.azure.cosmos.util.CosmosPagedIterable;
+import data_classes.Login;
+import data_classes.Session;
 import data_classes.User;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.NotAuthorizedException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.Cookie;
+import jakarta.ws.rs.core.NewCookie;
 import utils.CosmosDBLayer;
 import data_classes.UserDAO;
 import utils.RedisLayer;
@@ -18,6 +23,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.UUID;
 
 
 @Path("/user")
@@ -86,6 +92,49 @@ public class UserResource {
         if (badParam(password) || wrongPassword(userDAO, password))
             throw new WebApplicationException(Response.Status.FORBIDDEN);
         return userDAO.toUser();
+    }
+
+    public jakarta.ws.rs.core.Response auth(Login user) {
+        boolean pwd0k = false;
+
+        // check pwd
+        try {
+            if(getUser(user.getUserId(), user.getPwd()) != null)
+                pwd0k = true;
+        } catch (WebApplicationException e) {
+            // password is incorrect, user does not exist, etc
+        }
+
+        if(pwd0k) {
+            String uid = UUID.randomUUID().toString();
+            NewCookie cookie = new NewCookie.Builder("scc:session")
+                    .value(uid)
+                    .path("/")
+                    .comment("sessionid")
+                    .maxAge(3600)
+                    .secure(false)
+                    .httpOnly(true)
+                    .build();
+            rl.addSession(new Session(uid, user.getUserId()));
+            return jakarta.ws.rs.core.Response.ok().cookie(cookie).build();
+        } else
+            throw new NotAuthorizedException("Incorrect login");
+    }
+
+    public Session checkCookieUser(Cookie session, String id) throws NotAuthorizedException {
+        if (session == null || session.getValue() == null)
+            throw new NotAuthorizedException("No session initialized");
+        Session s;
+        try {
+            s = rl.getSession(session.getValue());
+        } catch (Exception e) {
+            throw new NotAuthorizedException("");
+        }
+        if (s == null || s.getUser() == null || s.getUser().length() == 0)
+            throw new NotAuthorizedException("No valid session initialized");
+        if (!s.getUser().equals(id) && !s.getUser().equals("adim"))
+            throw new NotAuthorizedException("Invalid user : " + s.getUser());
+        return s;
     }
 
     private UserDAO getUserHelper(String id) {
