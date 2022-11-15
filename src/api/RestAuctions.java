@@ -36,7 +36,6 @@ public interface RestAuctions {
     void createAuctionWithPhoto(@QueryParam(ID) String id,
                                 @QueryParam(TITLE) String title,
                                 @QueryParam(DESCRIPTION) String description,
-                                @QueryParam(IMAGEID) String imageId,
                                 @QueryParam(OWNERID) String ownerId,
                                 @QueryParam(ENDTIME) long endTime,
                                 @QueryParam(MINPRICE) int minPrice,
