@@ -33,8 +33,8 @@ public class AuctionResource implements RestAuctions {
     }
 
     @Override
-    public void createAuctionWithPhoto(String id, String title, String description, String imageId, String ownerId, long endTime, int minPrice, byte[] photo) {
-        mr.upload(photo, imageId);
+    public void createAuctionWithPhoto(String id, String title, String description, String ownerId, long endTime, int minPrice, byte[] photo) {
+        String imageId = mr.upload(photo);
         CosmosItemResponse<AuctionDAO> aucDAO = db.putAuction(new AuctionDAO(id,title,description,imageId,ownerId,endTime,minPrice));
         rl.addAuction(aucDAO.getItem());
     }

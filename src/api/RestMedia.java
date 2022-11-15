@@ -11,11 +11,11 @@ public interface RestMedia {
     /**
      * Uploads media.
      * @param contents - bytes of the media content.
-     * @param filename - media ID.
      */
     @POST
     @Consumes(MediaType.APPLICATION_OCTET_STREAM)
-    void upload(byte[] contents, @QueryParam(FILENAME) String filename);
+    @Produces(MediaType.APPLICATION_JSON)
+    String upload(byte[] contents);
 
     /**
      * Downloads media.

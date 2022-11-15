@@ -4,20 +4,15 @@ import api.RestUsers;
 import com.azure.cosmos.models.CosmosItemResponse;
 import com.azure.cosmos.util.CosmosPagedIterable;
 import data_classes.User;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
+import jakarta.ws.rs.*;
 import utils.CosmosDBLayer;
 import data_classes.UserDAO;
 import utils.RedisLayer;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Iterator;
-import java.util.Set;
 
 
 @Path("/user")
@@ -39,30 +34,38 @@ public class UserResource {
         //    throw new WebApplicationException(Response.Status.BAD_REQUEST);
         //if (getUserHelper(user.getId()) != null)
         //    throw new WebApplicationException(Response.Status.CONFLICT);
-        mr.upload(photo, user.getPhotoId());
+        mr.upload(photo);
         db.putUser(new UserDAO(user));
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public void createUser(User user) throws WebApplicationException {
+    @Produces(MediaType.APPLICATION_JSON)
+    public User createUser(User user) throws WebApplicationException {
         System.out.println("Creating user...");
-        if (badUser(user))
+        if (badUser(user)) {
+            System.out.println("Bad user...");
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
-        if (getUserHelper(user.getId()) != null)
+        }
+        if (getUserHelper(user.getId()) != null) {
+            System.out.println("Already exists user...");
             throw new WebApplicationException(Response.Status.CONFLICT);
-        // add to database
+        }
+
         CosmosItemResponse<UserDAO> udao = db.putUser(new UserDAO(user));
-        // add to cache
         rl.addUser(udao.getItem());
+        System.out.println(user.toString());
+        return user;
     }
 
+    @DELETE
+    @Path("/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
     public void deleteUser(String id, String password) throws WebApplicationException {
         System.out.println("Deleting user...");
         User user = getUser(id, password);
-        // delete from database
+
         db.delUser(new UserDAO(user));
-        // delete from cache
         rl.deleteUser(id);
     }
 
@@ -71,9 +74,8 @@ public class UserResource {
         User u = getUser(id, password);
         if (!u.getId().equals(user.getId()))
             throw new WebApplicationException(Response.Status.NOT_ACCEPTABLE);
-        // update database
+
         CosmosItemResponse<UserDAO> udao = db.updateUser(new UserDAO(user));
-        // update cache
         rl.updateUser(udao.getItem());
     }
 
