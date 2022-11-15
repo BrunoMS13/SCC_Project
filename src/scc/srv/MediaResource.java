@@ -12,6 +12,7 @@ import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobContainerClientBuilder;
 
 import jakarta.ws.rs.core.MediaType;
+import utils.IdGenerator;
 
 /**
  * Resource for managing media files, such as images.
@@ -21,7 +22,7 @@ public class MediaResource implements RestMedia
 
 	private String storageConnectionString = "DefaultEndpointsProtocol=https;AccountName=sccstwesteurope58569;AccountKey=xdWfFjojTkmXu9WalAAp1GyUm5HyiMinR6LmAY12SQSZkAb523mOHZWzhzeBapJ56IeRERo8DEQT+AStDepDfA==;EndpointSuffix=core.windows.net";
 
-	public void upload(byte[] contents, String filename) {
+	public String upload(byte[] contents) {
 		try {
 			BinaryData data = BinaryData.fromBytes(contents);
 
@@ -31,15 +32,19 @@ public class MediaResource implements RestMedia
 					.containerName("images")
 					.buildClient();
 
+
+			String id = "BlobID_" + IdGenerator.getInstance().generateUniqueId();;
+
 			// Get client to blob
-			BlobClient blob = containerClient.getBlobClient(filename);
+			BlobClient blob = containerClient.getBlobClient(id);
 
 			// Upload contents from BinaryData (check documentation for other alternatives)
 			blob.upload(data);
-
+			return id;
 		} catch( Exception e) {
 			e.printStackTrace();
 		}
+		return null;
 	}
 
 	public byte[] download(String filename) {
@@ -78,8 +83,15 @@ public class MediaResource implements RestMedia
 	public static void main(String[] args) {
 		MediaResource mr = new MediaResource();
 		// If already exists, it throws exception.
-		//mr.upload("asdasdasd".getBytes(), "random");
+		mr.upload("asdasdasd".getBytes());
+		mr.upload("asdffasdcasdxa".getBytes());
+		mr.upload("xasxas".getBytes());
+		mr.upload("asdasdasdsfaasd".getBytes());
 
-		System.out.println(new String(mr.download("cats.1.jpeg")));
+		MediaResource mr2 = new MediaResource();
+		mr2.upload("asdasdasdsfaasd".getBytes());
+		mr2.upload("asdasdasdsfaasd".getBytes());
+
+		//System.out.println(new String(mr.download("cats.1.jpeg")));
 	}
 }
