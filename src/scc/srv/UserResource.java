@@ -72,7 +72,6 @@ public class UserResource {
         User user = getUser(id, password);
 
         db.delUser(new UserDAO(user));
-        // delete from cache
         rl.deleteUser(id);
     }
 
@@ -81,7 +80,6 @@ public class UserResource {
         User u = getUser(id, password);
         if (!u.getId().equals(user.getId()))
             throw new WebApplicationException(Response.Status.NOT_ACCEPTABLE);
-        // update database
         CosmosItemResponse<UserDAO> udao = db.updateUser(new UserDAO(user));
         rl.updateUser(udao.getItem());
     }
