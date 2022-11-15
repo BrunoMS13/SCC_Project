@@ -97,6 +97,9 @@ public class UserResource {
         return userDAO.toUser();
     }
 
+    @POST
+    @Path("/auth")
+    @Consumes({MediaType.APPLICATION_JSON})
     public jakarta.ws.rs.core.Response auth(Login user) {
         boolean pwd0k = false;
 
