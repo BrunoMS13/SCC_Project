@@ -28,6 +28,20 @@ public class Auction {
         }
     }
 
+    public Auction(AuctionDAO auctionDAO) {
+        this.id = auctionDAO.getId();
+        this.ownerId = auctionDAO.getOwnerId();
+        this.title = auctionDAO.getTitle();
+        this.description = auctionDAO.getDescription();
+        this.endingTime = auctionDAO.getEndingTime();
+        this.status = auctionDAO.getStatus();
+        this.minPrice = auctionDAO.getMinPrice();
+        this.imageId = auctionDAO.getImageId();
+        this.winnerId = auctionDAO.getWinnerId();
+        this.bids = auctionDAO.getBids();
+        this.questions = auctionDAO.getQuestions();
+    }
+
     public Auction(String title, String description, String imageId, String ownerId, Date endTime, float minPrice) {
         if (this.id == null) {
             this.id = UUID.randomUUID().toString();

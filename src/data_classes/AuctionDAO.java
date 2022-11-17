@@ -65,6 +65,10 @@ public class AuctionDAO {
     public void setId(String id) {
         this.id = id;
     }
+
+    public String getTitle() {
+        return title;
+    }
     public void setOwnerId(String ownerId) {
         this.ownerId = ownerId;
     }
