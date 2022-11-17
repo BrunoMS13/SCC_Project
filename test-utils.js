@@ -264,8 +264,8 @@ function decideToCoverBid(context, events, done) {
  */
 function decideToReply(context, events, done) {
 	delete context.vars.reply;
-	if( typeof context.vars.user !== 'undefined' && typeof context.vars.questionOne !== 'undefined' && 
-			context.vars.questionOne.user === context.vars.user && 
+	if( typeof context.vars.user !== 'undefined' && typeof context.vars.questionOne !== 'undefined' &&
+			context.vars.questionOne.user === context.vars.user &&
 			typeof context.vars.questionOne.reply !== String &&
 			Math.random() > 0) {
 		context.vars.reply = `${Faker.lorem.paragraph()}`;
