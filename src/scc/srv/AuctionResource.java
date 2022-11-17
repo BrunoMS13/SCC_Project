@@ -13,11 +13,7 @@ import utils.CosmosDBLayer;
 import utils.RedisLayer;
 import javax.ws.rs.core.Response;
 import java.util.*;
-
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NoContentException;
-import javax.ws.rs.core.Response;
-import java.util.*;
 import java.util.stream.Stream;
 
 
