@@ -6,6 +6,8 @@ import jakarta.ws.rs.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+
 import com.azure.core.util.BinaryData;
 import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
@@ -33,7 +35,7 @@ public class MediaResource implements RestMedia
 					.buildClient();
 
 
-			String id = "BlobID_" + IdGenerator.getInstance().generateUniqueId();;
+			String id = "BlobID_" + UUID.randomUUID().toString();
 
 			// Get client to blob
 			BlobClient blob = containerClient.getBlobClient(id);

@@ -6,34 +6,45 @@ public class AuctionDAO {
     private String _rid;
     private String _ts;
     private String id;
+    private String title;
     private String ownerId;
     private String winnerId;
-    private String title;
     private String description;
     private String imageId;
-    private int minPrice;
-    private long endingTime;
+    private float minPrice;
+    private Date endingTime;
     private Map<String, Bid> bids;
     private Map<String, Question> questions;
 
     private String status;
 
     public AuctionDAO() {
+        if (this.id == null) {
+            this.id = UUID.randomUUID().toString();
+            this.status = "OPEN";
+            this.bids = new HashMap<>();
+            this.questions = new HashMap<>();
+        }
     }
     public AuctionDAO(Auction a) {
-        this(a.getId(), a.getTitle(), a.getDescription(), a.getImageId(), a.getOwnerId(), a.getEndingTime(), a.getMinPrice());
+        this(a.getTitle(), a.getDescription(), a.getImageId(), a.getOwnerId(), a.getEndingTime(), a.getMinPrice());
+        this.id = a.getId();
+        this.bids = a.getBids();
+        this.questions = a.getQuestions();
     }
-    public AuctionDAO(String id, String title, String description, String imageId, String ownerId, long endTime, int minPrice) {
-        this.id = id;
+    public AuctionDAO(String title, String description, String imageId, String ownerId, Date endTime, float minPrice) {
+        if (this.id == null) {
+            this.id = UUID.randomUUID().toString();
+            this.status = "OPEN";
+            this.bids = new HashMap<>();
+            this.questions = new HashMap<>();
+        }
         this.title = title;
         this.description = description;
         this.ownerId = ownerId;
         this.imageId = imageId;
         this.minPrice = minPrice;
-        this.endingTime = System.currentTimeMillis() + endTime;
-        this.status = "OPEN";
-        this.bids = new HashMap<>();
-        this.questions = new HashMap<>();
+        this.endingTime = endTime;
     }
 
     public String get_rid() {
@@ -54,12 +65,6 @@ public class AuctionDAO {
     public void setId(String id) {
         this.id = id;
     }
-    public void setTitle(String title) {
-        this.title = title;
-    }
-    public String getTitle() {
-        return this.title;
-    }
     public void setOwnerId(String ownerId) {
         this.ownerId = ownerId;
     }
@@ -78,16 +83,16 @@ public class AuctionDAO {
     public String getImageId() {
         return this.imageId;
     }
-    public void setMinPrice(int minPrice) {
+    public void setMinPrice(float minPrice) {
         this.minPrice = minPrice;
     }
-    public int getMinPrice() {
+    public float getMinPrice() {
         return this.minPrice;
     }
-    public void setEndingTime(long endingTime) {
+    public void setEndingTime(Date endingTime) {
         this.endingTime = endingTime;
     }
-    public long getEndingTime() {
+    public Date getEndingTime() {
         return this.endingTime;
     }
     public void setStatus(String status) {
@@ -113,7 +118,7 @@ public class AuctionDAO {
     public Map<String, Question> getQuestions() {return this.questions;}
     @Override
     public String toString() {
-        return "Auction [title=" + this.title + " ownerId=" + this.ownerId + " status=" + this.status +  " minBid=" + this.minPrice + "]";
+        return "Auction [title=" + this.id + " ownerId=" + this.ownerId + " status=" + this.status +  " minBid=" + this.minPrice + "]";
     }
 
 }

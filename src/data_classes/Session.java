@@ -6,6 +6,7 @@ public class Session {
 
     private String token;
 
+    public Session() {}
     public Session(String user, String token) {
         this.user = user;
         this.token = token;

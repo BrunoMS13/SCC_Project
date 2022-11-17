@@ -1,23 +1,34 @@
 package data_classes;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import java.util.Date;
+import java.util.UUID;
+
 public class Bid {
     private String userId;
+    private String auctionId;
     private String bidId;
-    private int bidValue;
+    private float bidValue;
 
-    public Bid() {}
-    public Bid(String userId, String bidId, int bidValue) {
+    public Bid() {
+        if (this.bidId == null)
+            this.bidId = UUID.randomUUID().toString();
+    }
+    public Bid(String userId, String auctionId, float bidValue) {
+        this.bidId = UUID.randomUUID().toString();
+        this.auctionId = auctionId;
         this.userId = userId;
-        this.bidId = bidId;
         this.bidValue = bidValue;
     }
     public void setUserId(String userId) {this.userId = userId;}
     public void setBidId(String bidId) {this.bidId = bidId;}
-    public void setBidValue(int bidValue) {this.bidValue = bidValue;}
+    public void setBidValue(float bidValue) {this.bidValue = bidValue;}
 
+    public String getAuctionId() {return this.auctionId;}
     public String getUserId() {return this.userId;}
     public String getBidId() {return this.bidId;}
-    public int getBidValue() {return this.bidValue;}
+    public float getBidValue() {return this.bidValue;}
 
     @Override
     public String toString() {
