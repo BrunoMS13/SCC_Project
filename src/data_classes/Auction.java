@@ -27,7 +27,6 @@ public class Auction {
             this.questions = new Hashtable<>();
         }
     }
-
     public Auction(AuctionDAO auctionDAO) {
         this.id = auctionDAO.getId();
         this.ownerId = auctionDAO.getOwnerId();
@@ -41,7 +40,6 @@ public class Auction {
         this.bids = auctionDAO.getBids();
         this.questions = auctionDAO.getQuestions();
     }
-
     public Auction(String title, String description, String imageId, String ownerId, Date endTime, float minPrice) {
         if (this.id == null) {
             this.id = UUID.randomUUID().toString();
