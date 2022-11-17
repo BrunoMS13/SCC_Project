@@ -1,16 +1,21 @@
 package api;
 
+import data_classes.Auction;
 import data_classes.Login;
 import data_classes.User;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Cookie;
 import jakarta.ws.rs.core.MediaType;
 
+import java.util.Collection;
+import java.util.List;
+
 
 @Path("/user")
 public interface RestUsers {
 
     String ID = "id";
+    String STATUS = "status";
 
     /**
      * Creates user.
@@ -48,6 +53,11 @@ public interface RestUsers {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     User updateUser(@CookieParam("scc:session") Cookie session, User user) throws WebApplicationException;
+
+    @GET
+    @Path("/{" + ID + "}/auctions")
+    @Produces(MediaType.APPLICATION_JSON)
+    List<Auction> getUserAuctions(@CookieParam("scc:session") Cookie session, @QueryParam(STATUS) String status) throws WebApplicationException;
 
     /**
      * Login into session.

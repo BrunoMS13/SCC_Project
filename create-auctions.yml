@@ -7,9 +7,9 @@ config:
       useOnlyRequestNames: true  # new mode to aggregate metrics in artillery
   processor: "./test-utils.js"
   variables:
-    numAuctions : 2
-    maxBids : 5  # maximum number of bids to generate for each new auction
-    maxQuestions : 5 # maximum number of questions to generate for each new auction
+    numAuctions : 50
+    maxBids : 4  # maximum number of bids to generate for each new auction
+    maxQuestions : 4 # maximum number of questions to generate for each new auction
   phases:
   - name: "Create auctions"    # Create channels
     duration: 1

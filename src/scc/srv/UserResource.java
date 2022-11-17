@@ -1,33 +1,37 @@
 package scc.srv;
 
+import api.RestAuctions;
+import api.RestMedia;
 import api.RestUsers;
 import com.azure.cosmos.models.CosmosItemResponse;
 import com.azure.cosmos.util.CosmosPagedIterable;
-import data_classes.Login;
-import data_classes.Session;
-import data_classes.User;
+import data_classes.*;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Cookie;
 import jakarta.ws.rs.core.NewCookie;
 import utils.CosmosDBLayer;
-import data_classes.UserDAO;
 import utils.RedisLayer;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.UUID;
 
 
 public class UserResource implements RestUsers {
 
     private CosmosDBLayer db;
-    private MediaResource mr;
     private RedisLayer rl;
+    private RestAuctions ar;
+    private RestMedia mr;
+
 
     public UserResource() {
         this.db = CosmosDBLayer.getInstance();
         this.rl = RedisLayer.getInstance();
+        this.ar = new AuctionResource();
         this.mr = new MediaResource();
     }
 
@@ -60,7 +64,8 @@ public class UserResource implements RestUsers {
         System.out.println("Deleting user with id: " + id);
         checkCookieUser(session, id);
         UserDAO userDAO = getUserHelper(id);
-        // TODO - update user auctions to "deleted".
+
+        ar.updateAuctionsOfDeletedUser(id);
 
         db.delUser(userDAO);
         rl.deleteUser(id);
@@ -69,10 +74,19 @@ public class UserResource implements RestUsers {
 
     @Override
     public User updateUser(@CookieParam("scc:session") Cookie session, User user) throws WebApplicationException {
-        System.out.println("Updating user...");
+        System.out.println("Updating user... " + user.toString());
         checkCookieUser(session, user.getId());
         updateDataBases(new UserDAO(user));
         return user;
+    }
+
+    @Override
+    public List<Auction> getUserAuctions(Cookie session, String status) throws WebApplicationException {
+        Session s = rl.getSession(session.getValue());
+        System.out.println("Getting auctions of user= " + s.getUser() + " with status= " + status);
+        if (s == null || s.getUser() == null || s.getUser().length() == 0)
+            throw new NotAuthorizedException("No valid session initialized");
+        return ar.getUserAuctions(s.getUser(), status);
     }
 
     @Override
@@ -122,7 +136,7 @@ public class UserResource implements RestUsers {
     private Session checkCookieUser(Cookie session, String id) {
         if (session == null || session.getValue() == null)
             throw new NotAuthorizedException("No session initialized");
-        Session s = rl.getSession(session.getValue());;
+        Session s = rl.getSession(session.getValue());
         System.out.println(s.getUser() + " == " + id);
         if (s == null || s.getUser() == null || s.getUser().length() == 0)
             throw new NotAuthorizedException("No valid session initialized");

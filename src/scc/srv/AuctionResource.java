@@ -12,26 +12,22 @@ import jakarta.ws.rs.core.Cookie;
 import utils.CosmosDBLayer;
 import utils.RedisLayer;
 
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
 
 
 public class AuctionResource implements RestAuctions {
 
+    private final String DELETED_USER = "Deleted User";
+
     private CosmosDBLayer db;
     private MediaResource mr;
-    private UserResource ur;
     private RedisLayer rl;
 
     public AuctionResource() {
         this.db = CosmosDBLayer.getInstance();
         this.rl = RedisLayer.getInstance();
         this.mr = new MediaResource();
-        this.ur = new UserResource();
     }
 
     @Override
@@ -88,7 +84,7 @@ public class AuctionResource implements RestAuctions {
 
     @Override
     public String replyToQuestion(Cookie session, String id, String questionId, Text text) throws WebApplicationException {
-        System.out.println("Replying to question... " + questionId + " in auction: " + id + " with " + text);
+        System.out.println("Replying to question... " + questionId + " in auction: " + id + " with " + text.getReply());
         AuctionDAO auc = getAuction(id);
         checkCookieUser(session, auc.getOwnerId());
         if (badParam(text.getReply()))
@@ -121,7 +117,7 @@ public class AuctionResource implements RestAuctions {
 
     @Override
     public Collection<Bid> listBids(String id) throws WebApplicationException {
-        System.out.println("Printing this auction (ID: "+ id +") bids...");
+        System.out.println("Getting this auction (ID: "+ id +") bids...");
         AuctionDAO auc = getAuction(id);
         for (Bid bid: auc.getBids().values()) {
             System.out.println(bid);
@@ -129,9 +125,17 @@ public class AuctionResource implements RestAuctions {
         return auc.getBids().values();
     }
 
+    public Question getOneQuestion(String id) {
+        AuctionDAO auc = getAuction(id);
+        for (Question question: auc.getQuestions().values()) {
+           return question;
+        }
+        return null;
+    }
+
     @Override
     public Collection<Question> listQuestions(String id) {
-        System.out.println("Printing this auction (ID: "+id+") questions...");
+        System.out.println("Printing this auction (ID: " + id + ") questions...");
         AuctionDAO auc = getAuction(id);
         for (Question question: auc.getQuestions().values()) {
             System.out.println(question);
@@ -139,7 +143,52 @@ public class AuctionResource implements RestAuctions {
         return auc.getQuestions().values();
     }
 
-    public Session checkCookieUser(Cookie session, String id) {
+    @Override
+    public void updateAuctionsOfDeletedUser(String userId) {
+        Iterator<AuctionDAO> it = db.getAuctions().iterator();
+        while (it.hasNext()) {
+            boolean needUpdate = false;
+            AuctionDAO auctionDAO = it.next();
+            if (auctionDAO.getOwnerId().equals(userId)) {
+                needUpdate = true;
+                auctionDAO.setOwnerId(DELETED_USER);
+            }
+            Iterator<Bid> itBids = auctionDAO.getBids().values().iterator();
+            while (itBids.hasNext()) {
+                Bid bid = itBids.next();
+                if (bid.getUserId().equals(userId)) {
+                    bid.setUserId(DELETED_USER);
+                    needUpdate = true;
+                }
+            }
+            Iterator<Question> itQuestions = auctionDAO.getQuestions().values().iterator();
+            while (itQuestions.hasNext()) {
+                Question question = itQuestions.next();
+                if (question.getUser().equals(userId)) {
+                    needUpdate = true;
+                    question.setUser(DELETED_USER);
+                }
+            }
+            if (needUpdate)
+                updateDataBases(auctionDAO);
+        }
+    }
+
+    public List<Auction> getUserAuctions(String userId, String status) {
+        List<Auction> list = new ArrayList<>();
+        Iterator<AuctionDAO> it = db.getAuctions().iterator();
+        while (it.hasNext()) {
+            AuctionDAO auctionDAO = it.next();
+            if (auctionDAO.getOwnerId().equals(userId) && ('"' + auctionDAO.getStatus() + '"').equals(status)) {
+                Auction auction = new Auction(auctionDAO);
+                list.add(auction);
+                System.out.println(auction);
+            }
+        }
+        return list;
+    }
+
+    private Session checkCookieUser(Cookie session, String id) {
         if (session == null || session.getValue() == null)
             throw new NotAuthorizedException("No session initialized");
         Session s = rl.getSession(session.getValue());;
@@ -171,7 +220,7 @@ public class AuctionResource implements RestAuctions {
     private boolean badDate(Date date) {return date.getTime() < System.currentTimeMillis();}
     private boolean badNumber(float lg) {return lg <= 0;}
     private boolean badAuction(Auction auction) {
-        return auction == null || badParam(auction.getId()) || badParam(auction.getDescription()) || badParam(auction.getImageId()) || badParam(auction.getOwnerId()) || badNumber(auction.getMinPrice()) || badDate(auction.getEndingTime());
+        return auction == null || badParam(auction.getDescription()) || badParam(auction.getImageId()) || badParam(auction.getOwnerId()) || badNumber(auction.getMinPrice()) || badDate(auction.getEndingTime());
     }
 
     private void updateDataBases(AuctionDAO auctionDAO) {

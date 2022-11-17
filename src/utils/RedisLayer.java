@@ -127,7 +127,7 @@ public class RedisLayer {
         try (Jedis jedis = pool.getResource()){
             ObjectMapper mapper = new ObjectMapper();
             String key = "sessions:" + session.getToken();
-            System.out.println("Redis Session Key --->" + key);
+            //System.out.println("Redis Session Key --->" + key);
             jedis.hset(key, "session", mapper.writeValueAsString(session));
         } catch (Exception e) {
             System.out.println("Could not add session to cache...");
@@ -139,7 +139,7 @@ public class RedisLayer {
         try (Jedis jedis = pool.getResource()) {
             ObjectMapper mapper = new ObjectMapper();
             String key = "sessions:" + id;
-            System.out.println("Getting Key --->" + key);
+            //System.out.println("Getting Key --->" + key);
             String res = jedis.hget(key, "session");
             Session temp = mapper.readValue(res, Session.class);
             if (temp != null)
