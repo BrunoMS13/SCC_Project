@@ -112,7 +112,7 @@ public class AuctionDAO {
         bids.put(bid.getBidId(), bid);
         minPrice = bid.getBidValue();
     }
-    public void addQuestion(Question question) {questions.put(question.getQuestionId(), question);}
+    public void addQuestion(Question question) {questions.put(question.getId(), question);}
 
     public Map<String, Bid> getBids() {return this.bids;}
     public Map<String, Question> getQuestions() {return this.questions;}
