@@ -2,41 +2,60 @@ package api;
 
 import data_classes.Login;
 import data_classes.User;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Cookie;
 import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 
-import javax.ws.rs.*;
 
 @Path("/user")
 public interface RestUsers {
+
     String ID = "id";
-    String PASSWORD = "password";
 
-    //void createUserWithPhoto(User user, byte[] photo) throws WebApplicationException;
-
+    /**
+     * Creates user.
+     * @param user - user being created.
+     * @return - returns user created.
+     * @throws WebApplicationException
+     */
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    void createUser(User user); //throws WebApplicationException;
+    @Produces(MediaType.APPLICATION_JSON)
+    User createUser(User user) throws WebApplicationException;
 
+    /**
+     * Deletes user.
+     * @param session - active user session.
+     * @param id - user id.
+     * @return - returns deleted user.
+     * @throws WebApplicationException
+     */
     @DELETE
-    @Path("/{id}")
+    @Path("/{"+ ID + "}")
     @Consumes(MediaType.APPLICATION_JSON)
-    void deleteUser(@PathParam("id") String id, @QueryParam(PASSWORD) String password) throws WebApplicationException;
+    @Produces(MediaType.APPLICATION_JSON)
+    User deleteUser(@CookieParam("scc:session") Cookie session, @PathParam(ID) String id) throws WebApplicationException;
 
+    /**
+     * Updates user.
+     * @param session - active user session.
+     * @param user - user with updates.
+     * @return - returns updated user.
+     * @throws WebApplicationException
+     */
     @PUT
-    @Path("/{id}")
+    @Path("/{"+ ID + "}")
     @Consumes(MediaType.APPLICATION_JSON)
-    void updateUser(@PathParam(ID) String id, @QueryParam(PASSWORD) String password, User user) throws WebApplicationException;
+    @Produces(MediaType.APPLICATION_JSON)
+    User updateUser(@CookieParam("scc:session") Cookie session, User user) throws WebApplicationException;
 
-    @GET
-    @Path("/{id}")
-    @Consumes(MediaType.TEXT_PLAIN)
-    User getUser(@PathParam(ID) String id, @QueryParam(PASSWORD) String password) throws WebApplicationException;
-
+    /**
+     * Login into session.
+     * @param user - user logging in.
+     * @return - returns response.
+     */
     @POST
     @Path("/auth")
     @Consumes(MediaType.APPLICATION_JSON)
-    Response auth(Login login);
-
-
+    jakarta.ws.rs.core.Response auth(Login user);
 }

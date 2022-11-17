@@ -14,16 +14,12 @@ import data_classes.UserDAO;
 import utils.RedisLayer;
 
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.UUID;
-import java.util.logging.Logger;
 
 
-@Path("/user")
-public class UserResource {
+public class UserResource implements RestUsers {
 
     private CosmosDBLayer db;
     private MediaResource mr;
@@ -41,9 +37,7 @@ public class UserResource {
         createUser(user);
     }
 
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Override
     public User createUser(User user) throws WebApplicationException {
         System.out.println("Creating user...");
         if (badUser(user)) {
@@ -61,40 +55,27 @@ public class UserResource {
         return user;
     }
 
-    @DELETE
-    @Path("/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public void deleteUser(String id, String password) throws WebApplicationException {
-        System.out.println("Deleting user...");
-        User user = getUser(id, password);
-
-        db.delUser(new UserDAO(user));
-        rl.deleteUser(id);
-    }
-
-    public void updateUser(String id, String password, User user) throws WebApplicationException {
-        System.out.println("Updating user...");
-        User u = getUser(id, password);
-        if (!u.getId().equals(user.getId()))
-            throw new WebApplicationException(Response.Status.NOT_ACCEPTABLE);
-        CosmosItemResponse<UserDAO> udao = db.updateUser(new UserDAO(user));
-        rl.updateUser(udao.getItem());
-    }
-
-    public User getUser(String id, String password) throws WebApplicationException {
-        if (badParam(id))
-            throw new WebApplicationException(Response.Status.BAD_REQUEST);
+    @Override
+    public User deleteUser(@CookieParam("scc:session") Cookie session, String id) throws WebApplicationException {
+        System.out.println("Deleting user with id: " + id);
+        checkCookieUser(session, id);
         UserDAO userDAO = getUserHelper(id);
-        if (userDAO == null)
-            throw new WebApplicationException(Response.Status.NOT_FOUND);
-        if (badParam(password) || wrongPassword(userDAO, password))
-            throw new WebApplicationException(Response.Status.FORBIDDEN);
+        // TODO - update user auctions to "deleted".
+
+        db.delUser(userDAO);
+        rl.deleteUser(id);
         return userDAO.toUser();
     }
 
-    @POST
-    @Path("/auth")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Override
+    public User updateUser(@CookieParam("scc:session") Cookie session, User user) throws WebApplicationException {
+        System.out.println("Updating user...");
+        checkCookieUser(session, user.getId());
+        updateDataBases(new UserDAO(user));
+        return user;
+    }
+
+    @Override
     public jakarta.ws.rs.core.Response auth(Login user) {
         System.out.println("Authorizing user... " + user.getUser() + " " + user.getPwd());
         boolean pwd0k = getUser(user.getUser(), user.getPwd()) != null;
@@ -115,32 +96,44 @@ public class UserResource {
             throw new NotAuthorizedException("Incorrect login");
     }
 
-    public Session checkCookieUser(Cookie session, String id) throws NotAuthorizedException {
+    private User getUser(String id, String password) throws WebApplicationException {
+        if (badParam(id))
+            throw new WebApplicationException(Response.Status.BAD_REQUEST);
+        UserDAO userDAO = getUserHelper(id);
+        if (userDAO == null)
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        if (badParam(password) || wrongPassword(userDAO, password))
+            throw new WebApplicationException(Response.Status.FORBIDDEN);
+        return userDAO.toUser();
+    }
+
+    private UserDAO getUserHelper(String id) {
+        UserDAO user = rl.getUser(id);
+        if (user != null)
+            return user;
+
+        Iterator<UserDAO> it = db.getUserById(id).iterator();
+        if (!it.hasNext())
+            return null;
+        UserDAO temp = it.next();
+        return temp;
+    }
+
+    private Session checkCookieUser(Cookie session, String id) {
         if (session == null || session.getValue() == null)
             throw new NotAuthorizedException("No session initialized");
-        Session s;
-        try {
-            s = rl.getSession(session.getValue());
-        } catch (Exception e) {
-            throw new NotAuthorizedException("");
-        }
+        Session s = rl.getSession(session.getValue());;
+        System.out.println(s.getUser() + " == " + id);
         if (s == null || s.getUser() == null || s.getUser().length() == 0)
             throw new NotAuthorizedException("No valid session initialized");
-        if (!s.getUser().equals(id) && !s.getUser().equals("adim"))
+        if (!s.getUser().equals(id) && !s.getUser().equals("admin"))
             throw new NotAuthorizedException("Invalid user : " + s.getUser());
         return s;
     }
 
-    private UserDAO getUserHelper(String id) {
-        // try through cache
-        UserDAO user = rl.getUser(id);
-        if (user != null) return user;
-        // try through database
-        CosmosPagedIterable<UserDAO> resGet = db.getUserById(id);
-        Iterator<UserDAO> it = resGet.iterator();
-        if (!it.hasNext()) return null;
-        UserDAO temp = resGet.iterator().next();
-        return temp;
+    private void updateDataBases(UserDAO userDAO) {
+        db.updateUser(userDAO);
+        rl.updateUser(userDAO);
     }
 
     private boolean badParam(String str) {
@@ -153,28 +146,20 @@ public class UserResource {
         return !user.getPwd().equals(password);
     }
 
-    private void printRedisContents() {
-        rl.printContents();
-    }
-
-    private void clearRedis() {
-        rl.clearCache();
-    }
-
     public static void main(String[] args) {
 
         UserResource ur = new UserResource();
 
         //var a = RedisLayer.getInstance().getSession("4a9e83e9-ba49-4ebe-8e8e-a30f7cfe97ea");
 
-        var rl = RedisLayer.getInstance();
+        //var rl = RedisLayer.getInstance();
         //rl.clearCache();
         //rl.addUser(new UserDAO("aaa","222","bbb","ccc","ccc"));
         //rl.printContents();
         //System.out.println(rl.getUser("aaa").toString());
         //var x = ur.auth(new Login("Donny.Heidenreich","szsEZwRFltZ2RuK"));
 
-        System.out.println(rl.getSession("934db70f-d137-4e16-86dd-96f83fd5b741"));
+        //System.out.println(rl.getSession("934db70f-d137-4e16-86dd-96f83fd5b741"));
         /**
         ur.clearRedis();
 

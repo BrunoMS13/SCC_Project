@@ -1,8 +1,5 @@
 package data_classes;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
-import java.util.Date;
 import java.util.UUID;
 
 public class Bid {
@@ -16,7 +13,8 @@ public class Bid {
             this.bidId = UUID.randomUUID().toString();
     }
     public Bid(String userId, String auctionId, float bidValue) {
-        this.bidId = UUID.randomUUID().toString();
+        if (this.bidId == null)
+            this.bidId = UUID.randomUUID().toString();
         this.auctionId = auctionId;
         this.userId = userId;
         this.bidValue = bidValue;

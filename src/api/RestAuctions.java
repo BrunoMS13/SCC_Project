@@ -3,6 +3,7 @@ package api;
 import data_classes.Auction;
 import data_classes.Bid;
 import data_classes.Question;
+import data_classes.Text;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Cookie;
 import jakarta.ws.rs.core.MediaType;
@@ -14,6 +15,7 @@ public interface RestAuctions {
     String ID = "id";
     String TITLE = "title";
     String PASSWORD = "password";
+    String QUESTIONID = "questionId";
     String DESCRIPTION = "description";
 
     /**
@@ -80,24 +82,24 @@ public interface RestAuctions {
     /**
      * Creates a question.
      * @param id - auction ID.
-     * @param password - user password.
      * @param question - created question.
      */
     @Path("/{" + ID + "}/question")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    void createQuestion(@CookieParam("scc:session") Cookie session, @PathParam(ID) String id, @QueryParam(PASSWORD) String password, Question question);
+    @Produces(MediaType.APPLICATION_JSON)
+    Question createQuestion(@CookieParam("scc:session") Cookie session, @PathParam(ID) String id, Question question);
 
     /**
      * Update question replies.
      * @param id - auction ID.
-     * @param password - user password.
-     * @param question - created question.
+     * @param reply - reply to question.
      */
-    @Path("/{" + ID + "}/question")
+    @Path("/{" + ID + "}/question/{" + QUESTIONID + "}/reply")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    void replyToQuestion(@CookieParam("scc:session") Cookie session, @PathParam(ID) String id, @QueryParam(PASSWORD) String password, Question question);
+    @Produces(MediaType.TEXT_PLAIN)
+    String replyToQuestion(@CookieParam("scc:session") Cookie session, @PathParam(ID) String id, @PathParam(QUESTIONID) String questionId, Text reply);
 
     /**
      * Lists all the questions to the respective auction ID.

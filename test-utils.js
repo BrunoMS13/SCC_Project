@@ -204,7 +204,7 @@ function genNewAuction(context, events, done) {
  */
 function genNewBid(context, events, done) {
 	if( typeof context.vars.bidValue == 'undefined') {
-		if( typeof context.vars.minimumPrice == 'undefined') {
+		if( typeof context.vars.minPrice == 'undefined') {
 			context.vars.bidValue = random(100)
 		} else {
 			context.vars.bidValue = context.vars.minPrice + random(3)

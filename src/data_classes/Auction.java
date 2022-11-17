@@ -89,7 +89,7 @@ public class Auction {
         return this.status;
     }
     public void addBid(Bid bid) {bids.put(bid.getBidId(), bid);}
-    public void addQuestion(Question question) {questions.put(question.getQuestionId(), question);}
+    public void addQuestion(Question question) {questions.put(question.getId(), question);}
 
     public Map<String, Bid> getBids() {return this.bids;}
     public Map<String, Question> getQuestions() {return this.questions;}
