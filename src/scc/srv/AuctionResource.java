@@ -11,9 +11,14 @@ import jakarta.ws.rs.NotAuthorizedException;
 import jakarta.ws.rs.core.Cookie;
 import utils.CosmosDBLayer;
 import utils.RedisLayer;
-
 import javax.ws.rs.core.Response;
 import java.util.*;
+
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.NoContentException;
+import javax.ws.rs.core.Response;
+import java.util.*;
+import java.util.stream.Stream;
 
 
 public class AuctionResource implements RestAuctions {
@@ -188,7 +193,34 @@ public class AuctionResource implements RestAuctions {
         return list;
     }
 
-    private Session checkCookieUser(Cookie session, String id) {
+    public Collection<Auction> trendingAuctions(int start, int length) throws NoContentException {
+        CosmosPagedIterable<AuctionNumBidsDAO> temp = db.getTrendingAuctions();
+
+        int nAuctions = (int) temp.stream().count();
+
+        if (nAuctions == 0)
+            throw new NoContentException("No trending auctions yet");
+
+        if (start > nAuctions-1)
+            throw new NoContentException("Number of auctions with bids is less than " + start);
+
+        // in case there aren't enough auctions, return as much as possible
+        if (start + length > nAuctions) {
+            length = nAuctions - start;
+        }
+        Stream<AuctionNumBidsDAO> stream = temp.stream().skip(start).limit(length);
+
+        Collection<Auction> auctions = new ArrayList<>();
+
+        for (AuctionNumBidsDAO aucInfo: stream.toList()) {
+            AuctionDAO aucDAO = db.getAuctionById(aucInfo.getId()).iterator().next();
+            auctions.add(new Auction(aucDAO));
+        }
+
+        return auctions;
+    }
+
+    public Session checkCookieUser(Cookie session, String id) {
         if (session == null || session.getValue() == null)
             throw new NotAuthorizedException("No session initialized");
         Session s = rl.getSession(session.getValue());;
@@ -236,8 +268,16 @@ public class AuctionResource implements RestAuctions {
         rl.clearCache();
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws NoContentException {
         AuctionResource ar = new AuctionResource();
+
+        Collection<Auction> a = ar.trendingAuctions(50, 300);
+        Iterator<Auction> b = a.iterator();
+        while (b.hasNext()) {
+            Auction c = b.next();
+            System.out.println(c.getId());
+            System.out.println(c.getBids().size());
+        }
 
         //System.out.println(ar.(null, "1edbac3d-40db-420b-9ec0-e957cde2758b", new Question("aaa",null,"What is?")).toString());
         //System.out.println(ar.createQuestion(null, "1edbac3d-40db-420b-9ec0-e957cde2758b", new Question("aaa",null,"What is it?")).toString());

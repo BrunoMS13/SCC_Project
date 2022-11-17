@@ -8,6 +8,7 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Cookie;
 import jakarta.ws.rs.core.MediaType;
 
+import javax.ws.rs.core.NoContentException;
 import java.util.Collection;
 import java.util.List;
 
@@ -136,4 +137,9 @@ public interface RestAuctions {
      * @return - list of the auctions.
      */
     List<Auction> getUserAuctions(String userId, String status);
+
+    @Path("/any/popular")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    Collection<Auction> trendingAuctions(@QueryParam("st") int start, @QueryParam("len") int length) throws NoContentException;
 }
