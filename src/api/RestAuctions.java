@@ -10,6 +10,7 @@ import jakarta.ws.rs.core.MediaType;
 
 import javax.ws.rs.core.NoContentException;
 import java.util.Collection;
+import java.util.List;
 
 @Path("/auction")
 public interface RestAuctions {
@@ -102,6 +103,7 @@ public interface RestAuctions {
     @Produces(MediaType.TEXT_PLAIN)
     String replyToQuestion(@CookieParam("scc:session") Cookie session, @PathParam(ID) String id, @PathParam(QUESTIONID) String questionId, Text reply);
 
+
     /**
      * Lists all the questions to the respective auction ID.
      * @param id - auction ID.
@@ -111,6 +113,30 @@ public interface RestAuctions {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     Collection<Question> listQuestions(@PathParam(ID) String id);
+
+    /**
+     * Returns first seen question in the auction.
+     * @param id - auction ID.
+     * @return First of the questions.
+     */
+    @Path("/{" + ID + "}/question_one")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    Question getOneQuestion(@PathParam(ID) String id);
+
+    /**
+     * Updates auction of deleted user with "Deleted User".
+     * @param userId - user id that has been deleted.
+     */
+    void updateAuctionsOfDeletedUser(String userId);
+
+    /**
+     * Gets the user auctions with the given status.
+     * @param userId - owner of the auctions.
+     * @param status - status of the auction.
+     * @return - list of the auctions.
+     */
+    List<Auction> getUserAuctions(String userId, String status);
 
     @Path("/any/popular")
     @GET

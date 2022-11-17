@@ -270,6 +270,7 @@ function decideToReply(context, events, done) {
 			Math.random() > 0) {
 		context.vars.reply = `${Faker.lorem.paragraph()}`;
 	}
+	context.vars.reply = `${Faker.lorem.paragraph()}`;
 	return done()
 }
 

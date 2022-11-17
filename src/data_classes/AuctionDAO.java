@@ -46,7 +46,10 @@ public class AuctionDAO {
         this.minPrice = minPrice;
         this.endingTime = endTime;
     }
-
+    public void setTitle(String title) {
+        this.title = title;
+    }
+    public String getTitle() {return this.title;}
     public String get_rid() {
         return _rid;
     }
