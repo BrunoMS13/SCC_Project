@@ -11,6 +11,7 @@ import com.azure.cosmos.models.CosmosQueryRequestOptions;
 import com.azure.cosmos.models.PartitionKey;
 import com.azure.cosmos.util.CosmosPagedIterable;
 import data_classes.AuctionDAO;
+import data_classes.AuctionNumBidsDAO;
 import data_classes.UserDAO;
 
 public class CosmosDBLayer {
@@ -41,7 +42,7 @@ public class CosmosDBLayer {
 	
 	private CosmosClient client;
 	private CosmosDatabase db;
-	protected CosmosContainer users, auctions;
+	protected CosmosContainer users, auctions, trendingAuctions;
 	
 	public CosmosDBLayer(CosmosClient client) {
 		this.client = client;
@@ -53,6 +54,7 @@ public class CosmosDBLayer {
 		db = client.getDatabase(DB_NAME);
 		users = db.getContainer("users");
 		auctions = db.getContainer("auctions");
+		trendingAuctions = db.getContainer("auctionsTrend");
 		
 	}
 
@@ -109,6 +111,11 @@ public class CosmosDBLayer {
 	public CosmosPagedIterable<AuctionDAO> getAuctions() {
 		init();
 		return auctions.queryItems("SELECT * FROM auctions ", new CosmosQueryRequestOptions(), AuctionDAO.class);
+	}
+
+	public CosmosPagedIterable<AuctionNumBidsDAO> getTrendingAuctions() {
+		init();
+		return trendingAuctions.queryItems("SELECT * FROM auctionsTrend ORDER BY auctionsTrend.bid_count DESC", new CosmosQueryRequestOptions(), AuctionNumBidsDAO.class);
 	}
 
 	public void close() {
