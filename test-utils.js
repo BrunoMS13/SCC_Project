@@ -182,8 +182,8 @@ function selectUserSkewed(context, events, done) {
 function genNewAuction(context, events, done) {
 	context.vars.title = `${Faker.commerce.productName()}`
 	context.vars.description = `${Faker.commerce.productDescription()}`
-	context.vars.minimumPrice = `${Faker.commerce.price()}`
-	context.vars.bidValue = context.vars.minimumPrice + random(3)
+	context.vars.minPrice = `${Faker.commerce.price()}`
+	context.vars.bidValue = context.vars.minPrice + random(3)
 	var maxBids = 5
 	if( typeof context.vars.maxBids !== 'undefined')
 		maxBids = context.vars.maxBids;
@@ -193,15 +193,9 @@ function genNewAuction(context, events, done) {
 	var d = new Date();
 	d.setTime(Date.now() + random( 300000));
 	context.vars.endTime = d.toISOString();
-	if( Math.random() > 0.2) { 
-		context.vars.status = "OPEN";
-		context.vars.numBids = random( maxBids);
-		context.vars.numQuestions = random( maxQuestions);
-	} else {
-		context.vars.status = "CLOSED";
-		delete context.vars.numBids;
-		delete context.vars.numQuestions;
-	}
+	context.vars.numBids = random( maxBids);
+	context.vars.numQuestions = random( maxQuestions);
+
 	return done()
 }
 
@@ -213,7 +207,7 @@ function genNewBid(context, events, done) {
 		if( typeof context.vars.minimumPrice == 'undefined') {
 			context.vars.bidValue = random(100)
 		} else {
-			context.vars.bidValue = context.vars.minimumPrice + random(3)
+			context.vars.bidValue = context.vars.minPrice + random(3)
 		}
 	}
 	context.vars.value = context.vars.bidValue;

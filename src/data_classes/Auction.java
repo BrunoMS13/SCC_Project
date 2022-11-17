@@ -1,35 +1,46 @@
 package data_classes;
 
-import java.util.Dictionary;
-import java.util.Hashtable;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import java.util.*;
 
 public class Auction {
 
     private String id;
-    private String ownerId;
-    private String winnerId;
     private String title;
+    private String ownerId;
     private String description;
     private String imageId;
-    private int minPrice;
-    private long endingTime;
-    private Dictionary<String, Bid> bids;
-    private Dictionary<String, Question> questions;
-
+    private float minPrice;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
+    private Date endingTime;
+    private Map<String, Bid> bids;
+    private Map<String, Question> questions;
     private String status;
+    private String winnerId;
 
-    public Auction() {}
-    public Auction(String id, String title, String description, String imageId, String ownerId, long endTime, int minPrice) {
-        this.id = id;
+    public Auction() {
+        if (this.id == null) {
+            this.id = UUID.randomUUID().toString();
+            this.status = "OPEN";
+            this.bids = new Hashtable<>();
+            this.questions = new Hashtable<>();
+        }
+    }
+
+    public Auction(String title, String description, String imageId, String ownerId, Date endTime, float minPrice) {
+        if (this.id == null) {
+            this.id = UUID.randomUUID().toString();
+            this.status = "OPEN";
+            this.bids = new HashMap<>();
+            this.questions = new HashMap<>();
+        }
         this.title = title;
         this.description = description;
         this.ownerId = ownerId;
         this.imageId = imageId;
         this.minPrice = minPrice;
         this.endingTime = endTime;
-        this.status = "OPEN";
-        this.bids = new Hashtable<>();
-        this.questions = new Hashtable<>();
     }
     public String getId() {
         return id;
@@ -37,18 +48,16 @@ public class Auction {
     public void setId(String id) {
         this.id = id;
     }
-    public void setTitle(String title) {
-        this.title = title;
-    }
-    public String getTitle() {
-        return this.title;
-    }
     public void setOwnerId(String ownerId) {
         this.ownerId = ownerId;
     }
     public String getOwnerId() {
         return this.ownerId;
     }
+    public void setTitle(String title) {
+        this.title = title;
+    }
+    public String getTitle() {return this.title;}
     public void setDescription(String description) {
         this.description = description;
     }
@@ -61,16 +70,16 @@ public class Auction {
     public String getImageId() {
         return this.imageId;
     }
-    public void setMinPrice(int minPrice) {
+    public void setMinPrice(float minPrice) {
         this.minPrice = minPrice;
     }
-    public int getMinPrice() {
+    public float getMinPrice() {
         return this.minPrice;
     }
-    public void setEndingTime(long endingTime) {
+    public void setEndingTime(Date endingTime) {
         this.endingTime = endingTime;
     }
-    public long getEndingTime() {
+    public Date getEndingTime() {
         return this.endingTime;
     }
     public void setStatus(String status) {
@@ -82,11 +91,11 @@ public class Auction {
     public void addBid(Bid bid) {bids.put(bid.getBidId(), bid);}
     public void addQuestion(Question question) {questions.put(question.getQuestionId(), question);}
 
-    public Dictionary<String, Bid> getBids() {return this.bids;}
-    public Dictionary<String, Question> getQuestions() {return this.questions;}
+    public Map<String, Bid> getBids() {return this.bids;}
+    public Map<String, Question> getQuestions() {return this.questions;}
     @Override
     public String toString() {
-        return "Auction [title=" + this.title + " ownerId=" + this.ownerId + " status=" + this.status + "]";
+        return "Auction [id=" + this.id + " ownerId=" + this.ownerId + " status=" + this.status + " winnerId=" + this.winnerId + " description=" + this.description + " imageId=" + this.imageId + " minPrice=" + this.minPrice + " endingDate=" + this.endingTime.toString() + "]";
     }
 
 }

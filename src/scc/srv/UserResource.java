@@ -19,6 +19,7 @@ import javax.ws.rs.core.Response;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 
 @Path("/user")
@@ -30,18 +31,14 @@ public class UserResource {
 
     public UserResource() {
         this.db = CosmosDBLayer.getInstance();
-        this.mr = new MediaResource();
         this.rl = RedisLayer.getInstance();
+        this.mr = new MediaResource();
     }
 
-    public void createUserWithPhoto(User user, byte[] photo) {//throws WebApplicationException {
+    public void createUserWithPhoto(User user, byte[] photo) {
         System.out.println("Creating user with photo...");
-        //if (badUser(user))
-        //    throw new WebApplicationException(Response.Status.BAD_REQUEST);
-        //if (getUserHelper(user.getId()) != null)
-        //    throw new WebApplicationException(Response.Status.CONFLICT);
         mr.upload(photo);
-        db.putUser(new UserDAO(user));
+        createUser(user);
     }
 
     @POST
@@ -97,17 +94,10 @@ public class UserResource {
 
     @POST
     @Path("/auth")
-    @Consumes({MediaType.APPLICATION_JSON})
+    @Consumes(MediaType.APPLICATION_JSON)
     public jakarta.ws.rs.core.Response auth(Login user) {
-        boolean pwd0k = false;
-
-        // check pwd
-        try {
-            if(getUser(user.getUserId(), user.getPwd()) != null)
-                pwd0k = true;
-        } catch (WebApplicationException e) {
-            // password is incorrect, user does not exist, etc
-        }
+        System.out.println("Authorizing user... " + user.getUser() + " " + user.getPwd());
+        boolean pwd0k = getUser(user.getUser(), user.getPwd()) != null;
 
         if(pwd0k) {
             String uid = UUID.randomUUID().toString();
@@ -119,7 +109,7 @@ public class UserResource {
                     .secure(false)
                     .httpOnly(true)
                     .build();
-            rl.addSession(new Session(uid, user.getUserId()));
+            rl.addSession(new Session(user.getUser(), uid));
             return jakarta.ws.rs.core.Response.ok().cookie(cookie).build();
         } else
             throw new NotAuthorizedException("Incorrect login");
@@ -175,6 +165,17 @@ public class UserResource {
 
         UserResource ur = new UserResource();
 
+        //var a = RedisLayer.getInstance().getSession("4a9e83e9-ba49-4ebe-8e8e-a30f7cfe97ea");
+
+        var rl = RedisLayer.getInstance();
+        //rl.clearCache();
+        //rl.addUser(new UserDAO("aaa","222","bbb","ccc","ccc"));
+        //rl.printContents();
+        //System.out.println(rl.getUser("aaa").toString());
+        //var x = ur.auth(new Login("Donny.Heidenreich","szsEZwRFltZ2RuK"));
+
+        System.out.println(rl.getSession("934db70f-d137-4e16-86dd-96f83fd5b741"));
+        /**
         ur.clearRedis();
 
         ur.createUser(new User("123","b","c12312asdasd","d", "e"));
@@ -197,6 +198,6 @@ public class UserResource {
         ur.printRedisContents();
 
         System.out.println("Over...");
-
+        */
     }
 }

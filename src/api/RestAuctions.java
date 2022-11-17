@@ -13,10 +13,6 @@ import java.util.Collection;
 public interface RestAuctions {
     String ID = "id";
     String TITLE = "title";
-    String IMAGEID = "imageId";
-    String OWNERID = "ownerId";
-    String ENDTIME = "endtime";
-    String MINPRICE = "minPrice";
     String PASSWORD = "password";
     String DESCRIPTION = "description";
 
@@ -31,6 +27,7 @@ public interface RestAuctions {
      * @param minPrice - auction min bid.
      * @param photo - contents of the photo being uploaded.
      */
+    /**
     @POST
     @Consumes(MediaType.APPLICATION_OCTET_STREAM)
     void createAuctionWithPhoto(@QueryParam(ID) String id,
@@ -40,7 +37,7 @@ public interface RestAuctions {
                                 @QueryParam(ENDTIME) long endTime,
                                 @QueryParam(MINPRICE) int minPrice,
                                 byte[] photo);
-
+    */
     /**
      * Creates an auction.
      * @param auction - auction being created.
@@ -48,7 +45,7 @@ public interface RestAuctions {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    void createAuction(@CookieParam("scc:session") Cookie session, Auction auction);
+    Auction createAuction(@CookieParam("scc:session") Cookie session, Auction auction);
 
     /**
      * Updates an auction.
@@ -60,14 +57,15 @@ public interface RestAuctions {
 
     /**
      * Creates a bid for the respective auction ID.
+     * @param session - auth session.
      * @param id - auction ID.
-     * @param password - user password.
      * @param bid - created bid.
      */
     @Path("/{" + ID + "}/bid")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    void createBid(@CookieParam("scc:session") Cookie session, @PathParam(ID) String id, @QueryParam(PASSWORD) String password, Bid bid);
+    @Produces(MediaType.APPLICATION_JSON)
+    Bid createBid(@CookieParam("scc:session") Cookie session, @PathParam(ID) String id, Bid bid);
 
     /**
      * Lists all the bids for the auction with the respective ID.

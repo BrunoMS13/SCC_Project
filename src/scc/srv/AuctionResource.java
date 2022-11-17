@@ -15,6 +15,7 @@ import utils.RedisLayer;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -33,16 +34,14 @@ public class AuctionResource implements RestAuctions {
         this.rl = RedisLayer.getInstance();
     }
 
-    @Override
-    public void createAuctionWithPhoto(String id, String title, String description, String ownerId, long endTime, int minPrice, byte[] photo) {
-        String imageId = mr.upload(photo);
-        CosmosItemResponse<AuctionDAO> aucDAO = db.putAuction(new AuctionDAO(id,title,description,imageId,ownerId,endTime,minPrice));
-        rl.addAuction(aucDAO.getItem());
-    }
+    //@Override
+    //public void createAuctionWithPhoto(String id, String title, String description, String ownerId, long endTime, int minPrice, byte[] photo) {
+
+    //}
 
     @Override
-    public void createAuction(Cookie session, Auction auction) throws WebApplicationException {
-        System.out.println("Creating auction...");
+    public Auction createAuction(Cookie session, Auction auction) throws WebApplicationException {
+        System.out.println("Creating auction... " + auction.toString());
         try {
             // checking that auction is correct and can be created
             if (badAuction(auction))
@@ -50,17 +49,21 @@ public class AuctionResource implements RestAuctions {
             if (getAuctionHelper(auction.getId()) != null)
                 throw new WebApplicationException(Response.Status.CONFLICT);
 
+            //System.out.println("Session value --->" + session.getValue());
             // checking cookies
-            checkCookieUser(session, auction.getOwnerId());
+            //checkCookieUser(session, auction.getOwnerId());
 
             // creating auction
             CosmosItemResponse<AuctionDAO> aucDAO = db.putAuction(new AuctionDAO(auction));
             rl.addAuction(aucDAO.getItem());
+            System.out.println(auction.toString());
+            return auction;
 
         } catch (WebApplicationException e) {
             throw e;
-        } catch (Exception e) {
-            throw new InternalServerErrorException(e);
+        } catch (NotAuthorizedException e) {
+            System.out.println("Not authorized exception caught --> " + session.getValue());
+           throw e;
         }
     }
 
@@ -83,14 +86,16 @@ public class AuctionResource implements RestAuctions {
     }
 
     @Override
-    public void createBid(Cookie session, String id, String password, Bid bid) throws WebApplicationException {
-        checkCookieUser(session, bid.getUserId());
+    public Bid createBid(Cookie session, String id, Bid bid) throws WebApplicationException {
+        System.out.println("Creating bid... " + bid.toString() + " in auction: " + id);
+        //checkCookieUser(session, bid.getUserId());
         AuctionDAO auc = getAuction(id);
-        ur.getUser(bid.getUserId(), password);
-        if (badParam(bid.getBidId()) || bid.getBidValue() < auc.getMinPrice())
-            throw new WebApplicationException(Response.Status.BAD_REQUEST);
+        //if (bid.getBidValue() < auc.getMinPrice())
+        //    throw new WebApplicationException(Response.Status.BAD_REQUEST);
         auc.addBid(bid);
         db.updateAuction(auc);
+        rl.updateAuction(auc);
+        return bid;
     }
 
     @Override
@@ -137,18 +142,15 @@ public class AuctionResource implements RestAuctions {
         return auc.getQuestions().values();
     }
 
-    public Session checkCookieUser(Cookie session, String id) throws NotAuthorizedException {
+    public Session checkCookieUser(Cookie session, String id) {
         if (session == null || session.getValue() == null)
             throw new NotAuthorizedException("No session initialized");
-        Session s;
-        try {
-            s = rl.getSession(session.getValue());
-        } catch (Exception e) {
-            throw new NotAuthorizedException("");
-        }
+        Session s = rl.getSession(session.getValue());;
+
+        System.out.println(s.getUser() + " == " + id);
         if (s == null || s.getUser() == null || s.getUser().length() == 0)
             throw new NotAuthorizedException("No valid session initialized");
-        if (!s.getUser().equals(id) && !s.getUser().equals("admim"))
+        if (!s.getUser().equals(id) && !s.getUser().equals("admin"))
             throw new NotAuthorizedException("Invalid user : " + s.getUser());
         return s;
     }
@@ -169,9 +171,10 @@ public class AuctionResource implements RestAuctions {
     private boolean badParam(String str) {
         return str == null;
     }
-    private boolean badNumber(long lg) {return lg <= 0;}
+    private boolean badDate(Date date) {return date.getTime() < System.currentTimeMillis();}
+    private boolean badNumber(float lg) {return lg <= 0;}
     private boolean badAuction(Auction auction) {
-        return auction == null || badParam(auction.getId()) || badParam(auction.getDescription()) || badParam(auction.getImageId()) || badParam(auction.getOwnerId()) || badParam(auction.getTitle()) || badNumber(auction.getMinPrice()) || badNumber(auction.getEndingTime());
+        return auction == null || badParam(auction.getId()) || badParam(auction.getDescription()) || badParam(auction.getImageId()) || badParam(auction.getOwnerId()) || badNumber(auction.getMinPrice()); //|| badDate(auction.getEndingTime());
     }
 
     private void printRedisContents() {
@@ -183,7 +186,19 @@ public class AuctionResource implements RestAuctions {
     }
 
     public static void main(String[] args) {
-        /*
+        AuctionResource ar = new AuctionResource();
+        //ar.printRedisContents();
+        //ar.getAuction("35ba3d9b-dbe0-4770-8b03-a7c2444cd1c4");
+        //var x = ar.listBids("35ba3d9b-dbe0-4770-8b03-a7c2444cd1c4").iterator();
+        //var a = new Auction("asdasd","dasdas","adadsa","aaaas",new Date(1130000000),5);
+        //System.out.println(a.toString());
+        //ar.createAuction(null, a);
+        //var b = ar.getAuction(a.getId());
+        //b.addBid(new Bid("monkey","id",5));
+        //AuctionDAO auc = ar.getAuction("35ba3d9b-dbe0-4770-8b03-a7c2444cd1c4");
+        //System.out.println(auc.toString());
+        ar.createBid(null, "35ba3d9b-dbe0-4770-8b03-a7c2444cd1c4", new Bid("dasdzzzssxxsas","dxxzzzxas",10));
+        /**
         AuctionResource ar = new AuctionResource();
         UserResource ur = new UserResource();
 
