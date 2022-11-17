@@ -13,11 +13,7 @@ import utils.CosmosDBLayer;
 import utils.RedisLayer;
 import javax.ws.rs.core.Response;
 import java.util.*;
-
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NoContentException;
-import javax.ws.rs.core.Response;
-import java.util.*;
 import java.util.stream.Stream;
 
 
@@ -44,16 +40,13 @@ public class AuctionResource implements RestAuctions {
                 throw new WebApplicationException(Response.Status.BAD_REQUEST);
             if (getAuctionHelper(auction.getId()) != null)
                 throw new WebApplicationException(Response.Status.CONFLICT);
-
             // checking cookies
             checkCookieUser(session, auction.getOwnerId());
-
             // creating auction
             CosmosItemResponse<AuctionDAO> aucDAO = db.putAuction(new AuctionDAO(auction));
             rl.addAuction(aucDAO.getItem());
             System.out.println(auction.toString());
             return auction;
-
         } catch (WebApplicationException e) {
             throw e;
         } catch (NotAuthorizedException e) {
@@ -108,7 +101,8 @@ public class AuctionResource implements RestAuctions {
         try {
             getAuction(auction.getId());
         } catch (WebApplicationException e) {
-            System.out.println();
+            System.out.println("Couldn't update");
+            throw e;
         }
         updateDataBases(new AuctionDAO(auction));
     }
@@ -193,30 +187,22 @@ public class AuctionResource implements RestAuctions {
         return list;
     }
 
-    public Collection<Auction> trendingAuctions(int start, int length) throws NoContentException {
+    public Collection<Auction> trendingAuctions(int start, int length) throws WebApplicationException {
         CosmosPagedIterable<AuctionNumBidsDAO> temp = db.getTrendingAuctions();
 
         int nAuctions = (int) temp.stream().count();
-
-        if (nAuctions == 0)
-            throw new NoContentException("No trending auctions yet");
-
-        if (start > nAuctions-1)
-            throw new NoContentException("Number of auctions with bids is less than " + start);
-
+        if (nAuctions == 0 || start > nAuctions-1)
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
         // in case there aren't enough auctions, return as much as possible
-        if (start + length > nAuctions) {
+        if (start + length > nAuctions)
             length = nAuctions - start;
-        }
         Stream<AuctionNumBidsDAO> stream = temp.stream().skip(start).limit(length);
-
         Collection<Auction> auctions = new ArrayList<>();
 
         for (AuctionNumBidsDAO aucInfo: stream.toList()) {
             AuctionDAO aucDAO = db.getAuctionById(aucInfo.getId()).iterator().next();
             auctions.add(new Auction(aucDAO));
         }
-
         return auctions;
     }
 
@@ -224,7 +210,6 @@ public class AuctionResource implements RestAuctions {
         if (session == null || session.getValue() == null)
             throw new NotAuthorizedException("No session initialized");
         Session s = rl.getSession(session.getValue());;
-
         System.out.println(s.getUser() + " == " + id);
         if (s == null || s.getUser() == null || s.getUser().length() == 0)
             throw new NotAuthorizedException("No valid session initialized");
