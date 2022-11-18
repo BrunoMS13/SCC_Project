@@ -1,0 +1,71 @@
+config:
+  target: 'https://scc23app-westeurope-58569.azurewebsites.net/rest'
+  http:
+    timeout: 10
+  plugins:
+    metrics-by-endpoint:
+      useOnlyRequestNames: true  # new mode to aggregate metrics in artillery
+  processor: "./test-utils.js"
+  variables:
+    numUpdates: 10
+  phases:
+    - name: "Updating users"    # Create channels
+      duration: 5
+      arrivalCount: 1
+
+
+scenarios:
+  - name: 'Updating users'
+    weight: 1
+    flow:
+      - loop:
+          - post: # First: post image for the user
+             url: "/media"
+             name: "POST:/media"
+             headers:
+               Content-Type: application/octet-stream
+               Accept: application/json
+             beforeRequest: "uploadImageBody"
+             capture:
+               regexp: "(.+)"
+               as: "imageId"              # capture the reply as image id to be used in user creation
+          - function: "genNewUser"         # Generate the needed information for the user
+          - post:
+             url: "/user"
+             name: "POST:/user"
+             headers:
+               Content-Type: application/json
+               Accept: application/json
+             json:
+               id: "{{ id }}"
+               name: "{{ name }}"
+               pwd: "{{ pwd }}"
+               nickname: "{{ nickname }}"
+               photoId: "{{ imageId }}"
+          - post: # First: login as a user
+              url: "/user/auth"
+              name: "POST:/user/auth"
+              headers:
+                Content-Type: application/json
+              json:
+                user: "{{ id }}"
+                pwd: "{{ pwd }}"
+          - function: "selectUserUpdates"
+          - put: # Update user
+              url: "/user"
+              name: "PUT:/user"
+              headers:
+                Content-Type: application/json
+                Accept: application/json
+              json:
+                id: "{{ id }}"
+                name: "{{ name }}"
+                pwd: "{{ pwd }}"
+                nickname: "{{ nickname }}"
+                photoId: "{{ imageId }}"
+          - delete: # Delete user
+              url: "/user/{{ id }}"
+              name: "DELETE:/user/*"
+              headers:
+                Accept: application/json
+        count: "{{ numUpdates }}"

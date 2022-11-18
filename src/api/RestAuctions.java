@@ -129,11 +129,11 @@ public interface RestAuctions {
     Collection<Auction> getAuctionsAboutToClose();
 
     /**
-     *
-     * @param start
-     * @param length
-     * @return
-     * @throws WebApplicationException
+     * Returns a list of the trending auctions starting in start until length.
+     * If it doesn't have enough, returns as much as it can.
+     * @param start - where to start.
+     * @param length - number of auctions.
+     * @return - list of trending auctions.
      */
     @Path("/any/popular")
     @GET
