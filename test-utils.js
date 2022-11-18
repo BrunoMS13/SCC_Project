@@ -274,7 +274,6 @@ function decideToReply(context, events, done) {
 	return done()
 }
 
-
 /**
  * Decide next action
  * 0 -> browse popular
@@ -286,7 +285,7 @@ function decideNextAction(context, events, done) {
 	if( rnd < 0.075)
 		context.vars.nextAction = 0; // browsing recent
 	else if( rnd < 0.15)
-		context.vars.nextAction = 1; // browsing popular
+		context.vars.nextAction = 0; // browsing popular
 	else if( rnd < 0.225)
 		context.vars.nextAction = 2; // browsing user
 	else if( rnd < 0.3)

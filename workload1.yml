@@ -27,6 +27,11 @@ scenarios:
           json:
             user: "{{ user }}"
             pwd: "{{ pwd }}"
+      - get: # Get info for initial page (assuming recent + popular)
+          url: "/auction/any/popular?st=0&len=20"
+          name: "GET:/auction/any/popular"
+          headers:
+            Accept: application/json
       - get:                          # Get user auctions
           url: "/user/{{ user }}/auctions?status=\"OPEN\""
           name: "GET:/user/*/auctions"
