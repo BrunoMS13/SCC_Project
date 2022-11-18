@@ -213,7 +213,7 @@ public class AuctionResource implements RestAuctions {
         Collection<Auction> auctions = new ArrayList<>();
 
         for (AuctionNumBidsDAO aucInfo: stream.toList()) {
-            AuctionDAO aucDAO = db.getAuctionById(aucInfo.getId()).iterator().next();
+            AuctionDAO aucDAO = getAuction(aucInfo.getId());
             auctions.add(new Auction(aucDAO));
         }
         return auctions;
@@ -241,6 +241,7 @@ public class AuctionResource implements RestAuctions {
         Iterator<AuctionDAO> it = resGet.iterator();
         if (!it.hasNext()) return null;
         temp = resGet.iterator().next();
+        rl.addAuction(temp);
         return temp;
     }
 

@@ -130,6 +130,7 @@ public class UserResource implements RestUsers {
         if (!it.hasNext())
             return null;
         UserDAO temp = it.next();
+        rl.addUser(temp);
         return temp;
     }
 
