@@ -1,0 +1,72 @@
+config:
+  target: 'https://scc23app-westeurope-58569.azurewebsites.net/rest'
+  http:
+    timeout: 10
+  plugins:
+    metrics-by-endpoint:
+      useOnlyRequestNames: true  # new mode to aggregate metrics in artillery
+  processor: "./test-utils.js"
+  phases:
+  - name: "Warm up"
+    arrivalRate: 1         
+    duration: 10
+  - name: "Test"
+    arrivalRate: 5         
+    duration: 60
+
+scenarios:
+  - name: 'User checks own auctions'
+    weight: 5
+    flow:
+      - function: "selectUserSkewed"
+      - post:                          # First: login as a user
+          url: "/user/auth"
+          name: "POST:/user/auth"
+          headers:
+            Content-Type: application/json
+          json:
+            user: "{{ user }}"
+            pwd: "{{ pwd }}"
+      - get: # Get info for initial page (assuming recent + popular)
+          url: "/auction/any/popular?st=0&len=20"
+          name: "GET:/auction/any/popular"
+          headers:
+            Accept: application/json
+      - get:                          # Get user auctions
+          url: "/user/{{ user }}/auctions?status=\"OPEN\""
+          name: "GET:/user/*/auctions"
+          headers:
+            Accept: application/json
+          capture: 
+            json: "$"
+            as: "auctionsLst"
+      - loop:                                   # Check bids
+        - get:                          # First: post image for the user
+            url: "/media/{{ $loopElement.imageId }}"
+            name: "GET:/media"
+            headers:
+              Accept: application/octet-stream
+        - get:
+            url: "/auction/{{ $loopElement.id }}/bid"
+            name: "GET:/auction/*/bid"
+            headers: 
+              Accept: application/json
+        - get:
+            url: "/auction/{{ $loopElement.id }}/question_one"
+            name: "GET:/auction/*/question_one"
+            headers: 
+              Accept: application/json
+            capture:
+              json: "$"
+              as: "questionOne"
+        - function: "decideToReply"
+        - post:                          # New reply
+            url: "/auction/{{ $loopElement.id }}/question/{{ questionOne.id }}/reply"
+            name: "POST:/auction/*/question/*/reply"
+            headers:
+              Content-Type: application/json
+              Accept: text/plain
+            json:
+              reply: "{{ reply }}"
+            ifTrue: "reply"
+        over: "auctionsLst"

@@ -20,6 +20,8 @@ import java.util.stream.Stream;
 public class AuctionResource implements RestAuctions {
 
     private final String DELETED_USER = "Deleted User";
+    // Number decided for auctions about to close, 1 hour.
+    private final long ABOUT_TO_CLOSE_N = 3600000;
 
     private CosmosDBLayer db;
     private MediaResource mr;
@@ -42,7 +44,6 @@ public class AuctionResource implements RestAuctions {
                 throw new WebApplicationException(Response.Status.CONFLICT);
             // checking cookies
             checkCookieUser(session, auction.getOwnerId());
-            // creating auction
             CosmosItemResponse<AuctionDAO> aucDAO = db.putAuction(new AuctionDAO(auction));
             rl.addAuction(aucDAO.getItem());
             System.out.println(auction.toString());
@@ -96,12 +97,12 @@ public class AuctionResource implements RestAuctions {
 
     @Override
     public void updateAuction(Cookie session, Auction auction) throws WebApplicationException {
-        System.out.println("Updating auction...");
+        System.out.println("Updating auction... " + auction.toString());
         checkCookieUser(session, auction.getOwnerId());
         try {
             getAuction(auction.getId());
         } catch (WebApplicationException e) {
-            System.out.println("Couldn't update");
+            System.out.println("Couldn't get auction");
             throw e;
         }
         updateDataBases(new AuctionDAO(auction));
@@ -173,6 +174,18 @@ public class AuctionResource implements RestAuctions {
         }
     }
 
+    public List<Auction> getAuctionsAboutToClose() {
+        List<Auction> aboutToClose = new ArrayList<>();
+        Iterator<AuctionDAO> it = db.getAuctions().iterator();
+        while (it.hasNext()) {
+            AuctionDAO auctionDAO = it.next();
+            if (auctionDAO.getEndingTime().getTime() < System.currentTimeMillis() + ABOUT_TO_CLOSE_N && auctionDAO.getStatus().equals("OPEN")) {
+                aboutToClose.add(new Auction(auctionDAO));
+            }
+        }
+        return aboutToClose;
+    }
+
     public List<Auction> getUserAuctions(String userId, String status) {
         List<Auction> list = new ArrayList<>();
         Iterator<AuctionDAO> it = db.getAuctions().iterator();
@@ -191,7 +204,7 @@ public class AuctionResource implements RestAuctions {
         CosmosPagedIterable<AuctionNumBidsDAO> temp = db.getTrendingAuctions();
 
         int nAuctions = (int) temp.stream().count();
-        if (nAuctions == 0 || start > nAuctions-1)
+        if (nAuctions == 0 || start > nAuctions - 1)
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         // in case there aren't enough auctions, return as much as possible
         if (start + length > nAuctions)
@@ -255,15 +268,7 @@ public class AuctionResource implements RestAuctions {
 
     public static void main(String[] args) throws NoContentException {
         AuctionResource ar = new AuctionResource();
-
-        Collection<Auction> a = ar.trendingAuctions(50, 300);
-        Iterator<Auction> b = a.iterator();
-        while (b.hasNext()) {
-            Auction c = b.next();
-            System.out.println(c.getId());
-            System.out.println(c.getBids().size());
-        }
-
+        //ar.clearRedis();
         //System.out.println(ar.(null, "1edbac3d-40db-420b-9ec0-e957cde2758b", new Question("aaa",null,"What is?")).toString());
         //System.out.println(ar.createQuestion(null, "1edbac3d-40db-420b-9ec0-e957cde2758b", new Question("aaa",null,"What is it?")).toString());
         //ar.replyToQuestion(null, "1edbac3d-40db-420b-9ec0-e957cde2758b", "9306aaea-d682-478c-8193-345a271b2bf5", "I don't know sorry ser. Actually I might know....");

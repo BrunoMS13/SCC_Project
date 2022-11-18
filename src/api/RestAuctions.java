@@ -14,33 +14,19 @@ import java.util.List;
 @Path("/auction")
 public interface RestAuctions {
     String ID = "id";
+    String START = "st";
+    String LENGTH = "len";
     String TITLE = "title";
     String PASSWORD = "password";
     String QUESTIONID = "questionId";
     String DESCRIPTION = "description";
 
     /**
-     * Creates an auction along with the uploaded image.
-     * @param id - auction ID.
-     * @param title - auction title.
-     * @param description - auction description.
-     * @param imageId - auction image ID.
-     * @param ownerId - owner ID of the auction.
-     * @param endTime - auction end time.
-     * @param minPrice - auction min bid.
-     * @param photo - contents of the photo being uploaded.
-     */
-    /**
+    @Path("/withPhoto")
     @POST
-    @Consumes(MediaType.APPLICATION_OCTET_STREAM)
-    void createAuctionWithPhoto(@QueryParam(ID) String id,
-                                @QueryParam(TITLE) String title,
-                                @QueryParam(DESCRIPTION) String description,
-                                @QueryParam(OWNERID) String ownerId,
-                                @QueryParam(ENDTIME) long endTime,
-                                @QueryParam(MINPRICE) int minPrice,
-                                byte[] photo);
-    */
+    @Consumes({MediaType.APPLICATION_OCTET_STREAM, MediaType.APPLICATION_JSON})
+    void createAuctionWithPhoto(Auction auction, byte[] photo);**/
+
     /**
      * Creates an auction.
      * @param auction - auction being created.
@@ -137,8 +123,23 @@ public interface RestAuctions {
      */
     List<Auction> getUserAuctions(String userId, String status);
 
+    /**
+     * Returns a list of auctions that are about to close.
+     * @return - list of auctions.
+     */
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    Collection<Auction> getAuctionsAboutToClose();
+
+    /**
+     *
+     * @param start
+     * @param length
+     * @return
+     * @throws WebApplicationException
+     */
     @Path("/any/popular")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    Collection<Auction> trendingAuctions(@QueryParam("st") int start, @QueryParam("len") int length) throws WebApplicationException;
+    Collection<Auction> trendingAuctions(@QueryParam(START) int start, @QueryParam(LENGTH) int length) throws WebApplicationException;
 }

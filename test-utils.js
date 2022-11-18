@@ -264,8 +264,8 @@ function decideToCoverBid(context, events, done) {
  */
 function decideToReply(context, events, done) {
 	delete context.vars.reply;
-	if( typeof context.vars.user !== 'undefined' && typeof context.vars.questionOne !== 'undefined' && 
-			context.vars.questionOne.user === context.vars.user && 
+	if( typeof context.vars.user !== 'undefined' && typeof context.vars.questionOne !== 'undefined' &&
+			context.vars.questionOne.user === context.vars.user &&
 			typeof context.vars.questionOne.reply !== String &&
 			Math.random() > 0) {
 		context.vars.reply = `${Faker.lorem.paragraph()}`;
@@ -273,7 +273,6 @@ function decideToReply(context, events, done) {
 	context.vars.reply = `${Faker.lorem.paragraph()}`;
 	return done()
 }
-
 
 /**
  * Decide next action
@@ -286,7 +285,7 @@ function decideNextAction(context, events, done) {
 	if( rnd < 0.075)
 		context.vars.nextAction = 0; // browsing recent
 	else if( rnd < 0.15)
-		context.vars.nextAction = 1; // browsing popular
+		context.vars.nextAction = 0; // browsing popular
 	else if( rnd < 0.225)
 		context.vars.nextAction = 2; // browsing user
 	else if( rnd < 0.3)
