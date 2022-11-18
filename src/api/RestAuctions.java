@@ -19,12 +19,6 @@ public interface RestAuctions {
     String QUESTIONID = "questionId";
 
     /**
-    @Path("/withPhoto")
-    @POST
-    @Consumes({MediaType.APPLICATION_OCTET_STREAM, MediaType.APPLICATION_JSON})
-    void createAuctionWithPhoto(Auction auction, byte[] photo);**/
-
-    /**
      * Creates an auction.
      * @param auction - auction being created.
      */
