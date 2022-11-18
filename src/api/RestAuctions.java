@@ -16,10 +16,7 @@ public interface RestAuctions {
     String ID = "id";
     String START = "st";
     String LENGTH = "len";
-    String TITLE = "title";
-    String PASSWORD = "password";
     String QUESTIONID = "questionId";
-    String DESCRIPTION = "description";
 
     /**
     @Path("/withPhoto")
