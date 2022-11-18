@@ -7,7 +7,7 @@ config:
       useOnlyRequestNames: true  # new mode to aggregate metrics in artillery
   processor: "./test-utils.js"
   variables:
-    numUsers : 4
+    numUsers : 30
   phases:
   - name: "Create users"    # Create users
     duration: 1

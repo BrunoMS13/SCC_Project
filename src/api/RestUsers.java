@@ -37,7 +37,6 @@ public interface RestUsers {
      */
     @DELETE
     @Path("/{"+ ID + "}")
-    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     User deleteUser(@CookieParam("scc:session") Cookie session, @PathParam(ID) String id) throws WebApplicationException;
 
@@ -49,7 +48,6 @@ public interface RestUsers {
      * @throws WebApplicationException
      */
     @PUT
-    @Path("/{"+ ID + "}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     User updateUser(@CookieParam("scc:session") Cookie session, User user) throws WebApplicationException;

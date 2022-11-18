@@ -13,7 +13,6 @@ import utils.CosmosDBLayer;
 import utils.RedisLayer;
 import javax.ws.rs.core.Response;
 import java.util.*;
-import javax.ws.rs.core.NoContentException;
 import java.util.stream.Stream;
 
 
@@ -40,13 +39,11 @@ public class AuctionResource implements RestAuctions {
             // checking that auction is correct and can be created
             if (badAuction(auction))
                 throw new WebApplicationException(Response.Status.BAD_REQUEST);
-            if (getAuctionHelper(auction.getId()) != null)
-                throw new WebApplicationException(Response.Status.CONFLICT);
             // checking cookies
             checkCookieUser(session, auction.getOwnerId());
             CosmosItemResponse<AuctionDAO> aucDAO = db.putAuction(new AuctionDAO(auction));
             rl.addAuction(aucDAO.getItem());
-            System.out.println(auction.toString());
+            System.out.println(auction);
             return auction;
         } catch (WebApplicationException e) {
             throw e;
@@ -125,6 +122,7 @@ public class AuctionResource implements RestAuctions {
         return auc.getBids().values();
     }
 
+    @Override
     public Question getOneQuestion(String id) {
         AuctionDAO auc = getAuction(id);
         for (Question question: auc.getQuestions().values()) {
@@ -267,8 +265,9 @@ public class AuctionResource implements RestAuctions {
         rl.clearCache();
     }
 
-    public static void main(String[] args) throws NoContentException {
+    public static void main(String[] args) {
         AuctionResource ar = new AuctionResource();
+        ar.printRedisContents();
         //ar.clearRedis();
         //System.out.println(ar.(null, "1edbac3d-40db-420b-9ec0-e957cde2758b", new Question("aaa",null,"What is?")).toString());
         //System.out.println(ar.createQuestion(null, "1edbac3d-40db-420b-9ec0-e957cde2758b", new Question("aaa",null,"What is it?")).toString());

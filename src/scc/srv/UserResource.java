@@ -48,14 +48,9 @@ public class UserResource implements RestUsers {
             System.out.println("Bad user...");
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
         }
-        if (getUserHelper(user.getId()) != null) {
-            System.out.println("Already exists user...");
-            throw new WebApplicationException(Response.Status.CONFLICT);
-        }
-
         CosmosItemResponse<UserDAO> udao = db.putUser(new UserDAO(user));
         rl.addUser(udao.getItem());
-        System.out.println(user.toString());
+        System.out.println(user);
         return user;
     }
 
@@ -64,9 +59,7 @@ public class UserResource implements RestUsers {
         System.out.println("Deleting user with id: " + id);
         checkCookieUser(session, id);
         UserDAO userDAO = getUserHelper(id);
-
         ar.updateAuctionsOfDeletedUser(id);
-
         db.delUser(userDAO);
         rl.deleteUser(id);
         return userDAO.toUser();
@@ -165,16 +158,7 @@ public class UserResource implements RestUsers {
 
         UserResource ur = new UserResource();
 
-        //var a = RedisLayer.getInstance().getSession("4a9e83e9-ba49-4ebe-8e8e-a30f7cfe97ea");
-
-        //var rl = RedisLayer.getInstance();
-        //rl.clearCache();
-        //rl.addUser(new UserDAO("aaa","222","bbb","ccc","ccc"));
-        //rl.printContents();
-        //System.out.println(rl.getUser("aaa").toString());
-        //var x = ur.auth(new Login("Donny.Heidenreich","szsEZwRFltZ2RuK"));
-
-        //System.out.println(rl.getSession("934db70f-d137-4e16-86dd-96f83fd5b741"));
+        //ur.createUser(new User());
         /**
         ur.clearRedis();
 
