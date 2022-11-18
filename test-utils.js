@@ -9,7 +9,6 @@ module.exports = {
   genNewUserReply,
   selectUserUpdates,
   selectUser,
-  selectUserSkewedMine,
   selectUserSkewed,
   genNewAuction,
   genNewBid,
@@ -140,25 +139,6 @@ function selectUserUpdates(context, events, done) {
     context.vars.name = first + " " + last
     context.vars.nickname = last
     return done()
-}
-
-/**
- * Select user skewed for my testing
- */
-function selectUserSkewedMine(context, events, done) {
-    console.log(users.length)
-	if( users.length > 0) {
-		let user = users.sampleSkewed()
-		context.vars.user = user.id
-		context.vars.pwd = user.pwd
-		context.vars.photoId = user.photoId
-		console.log(user.id + " " + user.pwd + " " + user.photoId)
-	} else {
-		delete context.vars.user
-		delete context.vars.pwd
-		delete context.vars.photoId
-	}
-	return done()
 }
 
 /**

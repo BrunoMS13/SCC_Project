@@ -14,7 +14,6 @@ import utils.RedisLayer;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -35,12 +34,6 @@ public class UserResource implements RestUsers {
         this.mr = new MediaResource();
     }
 
-    public void createUserWithPhoto(User user, byte[] photo) {
-        System.out.println("Creating user with photo...");
-        mr.upload(photo);
-        createUser(user);
-    }
-
     @Override
     public User createUser(User user) throws WebApplicationException {
         System.out.println("Creating user...");
@@ -48,8 +41,10 @@ public class UserResource implements RestUsers {
             System.out.println("Bad user...");
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
         }
-        CosmosItemResponse<UserDAO> udao = db.putUser(new UserDAO(user));
-        rl.addUser(udao.getItem());
+        UserDAO userDAO = new UserDAO(user);
+        userDAO.setPwd(scc.utils.Hash.of(user.getPwd()));
+        db.putUser(userDAO);
+        rl.addUser(userDAO);
         System.out.println(user);
         return user;
     }
@@ -69,7 +64,10 @@ public class UserResource implements RestUsers {
     public User updateUser(@CookieParam("scc:session") Cookie session, User user) throws WebApplicationException {
         System.out.println("Updating user... " + user.toString());
         checkCookieUser(session, user.getId());
-        updateDataBases(new UserDAO(user));
+        UserDAO userDAO = new UserDAO(user);
+        userDAO.setPwd(scc.utils.Hash.of(user.getPwd()));
+
+        updateDataBases(userDAO);
         return user;
     }
 
@@ -150,10 +148,18 @@ public class UserResource implements RestUsers {
         return user == null || badParam(user.getId()) || badParam(user.getName()) || badParam(user.getPwd()) || badParam(user.getNickname()) || badParam(user.getPhotoId());
     }
     private boolean wrongPassword(UserDAO user, String password) {
-        return !user.getPwd().equals(password);
+        return !user.getPwd().equals(scc.utils.Hash.of(password));
     }
 
     public static void main(String[] args) {
+
+        var x = "aaaa";
+        String a = scc.utils.Hash.of(x);
+        System.out.println(a);
+
+        var b = "aaaa";
+        String z = scc.utils.Hash.of(b);
+        System.out.println(z);
 
         UserResource ur = new UserResource();
 
