@@ -151,7 +151,7 @@
         <configuration> 
           <schemaVersion>V2</schemaVersion>  
           <pricingTier>B1</pricingTier>  
-          <region>westeurope</region>  
+          <region>eastasia</region>
           <runtime> 
             <os>linux</os>  
             <javaVersion>Java 17</javaVersion>  
@@ -167,8 +167,8 @@
               </resource> 
             </resources> 
           </deployment>  
-          <resourceGroup>scc23-rg-westeurope-58569</resourceGroup>  
-          <appName>scc23app-westeurope-58569</appName> 
+          <resourceGroup>scc23-rg-eastasia-58569</resourceGroup>
+          <appName>scc23app-eastasia-58569</appName>
         </configuration> 
       </plugin> 
     </plugins> 

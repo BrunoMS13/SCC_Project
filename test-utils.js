@@ -195,7 +195,7 @@ function genNewAuction(context, events, done) {
 	context.vars.title = `${Faker.commerce.productName()}`
 	context.vars.description = `${Faker.commerce.productDescription()}`
 	context.vars.minPrice = `${Faker.commerce.price()}`
-	context.vars.bidValue = context.vars.minPrice + random(3)
+	context.vars.bidValue = parseFloat(context.vars.minPrice) + random(3)
 	var maxBids = 5
 	if( typeof context.vars.maxBids !== 'undefined')
 		maxBids = context.vars.maxBids;
@@ -219,11 +219,12 @@ function genNewBid(context, events, done) {
 		if( typeof context.vars.minPrice == 'undefined') {
 			context.vars.bidValue = random(100)
 		} else {
-			context.vars.bidValue = context.vars.minPrice + random(3)
+			context.vars.bidValue = parseFloat(context.vars.minPrice) + random(3)
 		}
 	}
 	context.vars.value = context.vars.bidValue;
-	context.vars.bidValue = context.vars.bidValue + 1 + random(3)
+	context.vars.bidValue =  parseFloat(context.vars.bidValue) + 1 + random(3)
+
 	return done()
 }
 
