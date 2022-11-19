@@ -22,7 +22,7 @@ import utils.IdGenerator;
 public class MediaResource implements RestMedia
 {
 
-	private String storageConnectionString = "DefaultEndpointsProtocol=https;AccountName=sccstwesteurope58569;AccountKey=xdWfFjojTkmXu9WalAAp1GyUm5HyiMinR6LmAY12SQSZkAb523mOHZWzhzeBapJ56IeRERo8DEQT+AStDepDfA==;EndpointSuffix=core.windows.net";
+	private String storageConnectionString = "DefaultEndpointsProtocol=https;AccountName=sccsteastasia58569;AccountKey=ilh8aQ36AzTiND7jUvGjZrzc2xqYCXuHbu7vjYDN61sqtQQMA8UQiMQCeYqSPX6n8/ixzxlCfJzN+AStZqUnZg==;EndpointSuffix=core.windows.net";
 
 	public String upload(byte[] contents) {
 		try {

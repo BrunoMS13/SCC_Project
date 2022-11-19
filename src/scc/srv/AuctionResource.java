@@ -58,8 +58,8 @@ public class AuctionResource implements RestAuctions {
         System.out.println("Creating bid... " + bid.toString() + " in auction: " + id);
         checkCookieUser(session, bid.getUserId());
         AuctionDAO auc = getAuction(id);
-        //if (bid.getBidValue() < auc.getMinPrice())
-        //    throw new WebApplicationException(Response.Status.BAD_REQUEST);
+        if (bid.getBidValue() < auc.getMinPrice())
+            throw new WebApplicationException(Response.Status.BAD_REQUEST);
         auc.addBid(bid);
         updateDataBases(auc);
 

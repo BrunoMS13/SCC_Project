@@ -1,13 +1,13 @@
 config:
-  target: 'https://scc23app-westeurope-58569.azurewebsites.net/rest'
+  target: 'https://scc23app-eastasia-58569.azurewebsites.net/rest'
   http:
-    timeout: 10
+    timeout: 30
   plugins:
     metrics-by-endpoint:
       useOnlyRequestNames: true  # new mode to aggregate metrics in artillery
   processor: "./test-utils.js"
   variables:
-    numUpdates: 10
+    numUpdates: 100
   phases:
     - name: "Updating users"    # Create channels
       duration: 5

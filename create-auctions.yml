@@ -1,5 +1,5 @@
 config:
-  target: 'https://scc23app-westeurope-58569.azurewebsites.net/rest'
+  target: 'https://scc23app-eastasia-58569.azurewebsites.net/rest'
   http:
     timeout: 10
   plugins:

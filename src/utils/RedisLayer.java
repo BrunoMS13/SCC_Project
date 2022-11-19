@@ -14,12 +14,15 @@ import java.util.Map;
 import java.util.Set;
 
 public class RedisLayer {
-    private static final String RedisHostname = "scc23cache-58569.redis.cache.windows.net";
-    private static final String RedisKey = "VQZ6deAFTRCoIC4uuO8596JA4f6JuoNL3AzCaDEns1g=";
+    private static final String RedisHostname = "rediseastasia58569.redis.cache.windows.net";
+    private static final String RedisKey = "8zPF2NsimpIt6YyGX61oO4JfEFzfu6ZR3AzCaMi8bFg=";
 
     private static JedisPool pool;
 
     private static RedisLayer instance;
+
+    // Flag to use cache or not.
+    private boolean useCache = false;
 
     public synchronized static RedisLayer getInstance() {
         if( instance != null)
@@ -45,80 +48,90 @@ public class RedisLayer {
 
 
     public void addUser(UserDAO user) {
-        try (Jedis jedis = pool.getResource()){
-            ObjectMapper mapper = new ObjectMapper();
-            String key = "users:" + user.getId();
-            jedis.hset(key, "user", mapper.writeValueAsString(user));
-        } catch (Exception e) {
-            System.out.println("Could not add user to cache...");
-            System.out.println(e.getMessage());
+        if (useCache) {
+            try (Jedis jedis = pool.getResource()) {
+                ObjectMapper mapper = new ObjectMapper();
+                String key = "users:" + user.getId();
+                jedis.hset(key, "user", mapper.writeValueAsString(user));
+            } catch (Exception e) {
+                System.out.println("Could not add user to cache...");
+                System.out.println(e.getMessage());
+            }
         }
     }
 
     public void updateUser(UserDAO user) {
-        try (Jedis jedis = pool.getResource()) {
-            ObjectMapper mapper = new ObjectMapper();
-            String key = "users:" + user.getId();
-            jedis.hset(key, "user", mapper.writeValueAsString(user));
-        } catch (Exception e) {
-            System.out.println(e);
+        if (useCache) {
+            try (Jedis jedis = pool.getResource()) {
+                ObjectMapper mapper = new ObjectMapper();
+                String key = "users:" + user.getId();
+                jedis.hset(key, "user", mapper.writeValueAsString(user));
+            } catch (Exception e) {
+                System.out.println(e);
+            }
         }
     }
 
     public void deleteUser(String id) {
-        try (Jedis jedis = pool.getResource()){
-            String key = "users:" + id;
-            jedis.del(key);
-        } catch (Exception e) {
-            System.out.println("Could not remove user from cache...");
+        if (useCache) {
+            try (Jedis jedis = pool.getResource()) {
+                String key = "users:" + id;
+                jedis.del(key);
+            } catch (Exception e) {
+                System.out.println("Could not remove user from cache...");
+            }
         }
     }
 
     public UserDAO getUser(String id) {
-        try (Jedis jedis = pool.getResource()) {
-            ObjectMapper mapper = new ObjectMapper();
-            String key = "users:" + id;
-            String res = jedis.hget(key, "user");
-            UserDAO temp = mapper.readValue(res, UserDAO.class);
-            if (temp != null)
-                return temp;
-        } catch (Exception e) {
-
+        if (useCache) {
+            try (Jedis jedis = pool.getResource()) {
+                ObjectMapper mapper = new ObjectMapper();
+                String key = "users:" + id;
+                String res = jedis.hget(key, "user");
+                UserDAO temp = mapper.readValue(res, UserDAO.class);
+                if (temp != null)
+                    return temp;
+            } catch (Exception e) {}
         }
         return null;
     }
 
     public void addAuction(AuctionDAO auc) {
-        try (Jedis jedis = pool.getResource()){
-            ObjectMapper mapper = new ObjectMapper();
-            String key = "auctions:" + auc.getId();
-            jedis.hset(key, "auction", mapper.writeValueAsString(auc));
-        } catch (Exception e) {
-            System.out.println("Could not add auction to cache...");
-            System.out.println(e.getMessage());
+        if (useCache) {
+            try (Jedis jedis = pool.getResource()) {
+                ObjectMapper mapper = new ObjectMapper();
+                String key = "auctions:" + auc.getId();
+                jedis.hset(key, "auction", mapper.writeValueAsString(auc));
+            } catch (Exception e) {
+                System.out.println("Could not add auction to cache...");
+                System.out.println(e.getMessage());
+            }
         }
     }
 
     public void updateAuction(AuctionDAO auction) {
-        try (Jedis jedis = pool.getResource()) {
-            ObjectMapper mapper = new ObjectMapper();
-            String key = "auctions:" + auction.getId();
-            jedis.hset(key, "auction", mapper.writeValueAsString(auction));
-        } catch (Exception e) {
-            System.out.println(e);
+        if (useCache) {
+            try (Jedis jedis = pool.getResource()) {
+                ObjectMapper mapper = new ObjectMapper();
+                String key = "auctions:" + auction.getId();
+                jedis.hset(key, "auction", mapper.writeValueAsString(auction));
+            } catch (Exception e) {
+                System.out.println(e);
+            }
         }
     }
 
     public AuctionDAO getAuction(String id) {
-        try (Jedis jedis = pool.getResource()) {
-            ObjectMapper mapper = new ObjectMapper();
-            String key = "auctions:" + id;
-            String res = jedis.hget(key, "auction");
-            AuctionDAO temp = mapper.readValue(res, AuctionDAO.class);
-            if (temp != null)
-                return temp;
-        } catch (Exception e) {
-
+        if (useCache) {
+            try (Jedis jedis = pool.getResource()) {
+                ObjectMapper mapper = new ObjectMapper();
+                String key = "auctions:" + id;
+                String res = jedis.hget(key, "auction");
+                AuctionDAO temp = mapper.readValue(res, AuctionDAO.class);
+                if (temp != null)
+                    return temp;
+            } catch (Exception e) {}
         }
         return null;
     }
