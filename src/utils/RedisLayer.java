@@ -14,8 +14,8 @@ import java.util.Map;
 import java.util.Set;
 
 public class RedisLayer {
-    private static final String RedisHostname = "rediseastasia58569.redis.cache.windows.net";
-    private static final String RedisKey = "8zPF2NsimpIt6YyGX61oO4JfEFzfu6ZR3AzCaMi8bFg=";
+    private static final String RedisHostname = "rediswesteurope58569.redis.cache.windows.net";
+    private static final String RedisKey = "uhsc1yk1tzErNZ8bdjkUCPt98Z7bOcsvNAzCaFF2d2M=";
 
     private static JedisPool pool;
 

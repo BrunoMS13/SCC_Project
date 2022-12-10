@@ -16,10 +16,10 @@ public class MainApplication extends Application
 
 	public MainApplication() {
 		resources.add(ControlResource.class);
+
 		resources.add(MediaResource.class);
 		resources.add(UserResource.class);
 		resources.add(AuctionResource.class);
-		resources.add(GenericExceptionMapper.class);
 
 		singletons.add(new MediaResource());
 		singletons.add(new UserResource());

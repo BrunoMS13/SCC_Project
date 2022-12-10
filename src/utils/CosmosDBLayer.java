@@ -16,7 +16,7 @@ import data_classes.UserDAO;
 
 public class CosmosDBLayer {
 	private static final String CONNECTION_URL = "https://scc58569.documents.azure.com:443/";
-	private static final String DB_KEY = "rKufslJZpKtHxasRe0NxnF8Tsl05i1ZRpCkIz9TT9mVwWeLOqxgh17cJgyIs3ydoLK67ZYGvOhzuACDb4IvkRQ==";
+	private static final String DB_KEY = "0lSn4NbbZ761rnCA1QPbDZl6dUCFwkZ9ir0KlsFTytdCmRg2dZvud59kiFIpdS63dkZAnF1HBhIiACDbOVjdqQ==";
 	private static final String DB_NAME = "scc23db58569";
 	
 	private static CosmosDBLayer instance;

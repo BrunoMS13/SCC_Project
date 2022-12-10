@@ -28,8 +28,10 @@ public class UserResource implements RestUsers {
 
 
     public UserResource() {
-        this.db = CosmosDBLayer.getInstance();
-        this.rl = RedisLayer.getInstance();
+        try {
+            this.db = CosmosDBLayer.getInstance();
+            this.rl = RedisLayer.getInstance();
+        } catch (Exception e) {}
         this.ar = new AuctionResource();
         this.mr = new MediaResource();
     }

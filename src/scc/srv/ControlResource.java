@@ -5,6 +5,8 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 
+import java.util.Date;
+
 /**
  * Class with control endpoints.
  */
@@ -20,7 +22,7 @@ public class ControlResource
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
 	public String hello() {
-		return "v: 0007";
+		return new Date().toString() + " Version 14.3";
 	}
 
 }
