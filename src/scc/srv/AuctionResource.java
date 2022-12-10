@@ -27,8 +27,10 @@ public class AuctionResource implements RestAuctions {
     private RedisLayer rl;
 
     public AuctionResource() {
-        this.db = CosmosDBLayer.getInstance();
-        this.rl = RedisLayer.getInstance();
+        try {
+            this.db = CosmosDBLayer.getInstance();
+            this.rl = RedisLayer.getInstance();
+        } catch (Exception e) {}
         this.mr = new MediaResource();
     }
 

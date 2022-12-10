@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scc-app-redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: scc-app-redis
+  template:
+    metadata:
+      labels:
+        app: scc-app-redis
+    spec:
+      nodeSelector:
+        "beta.kubernetes.io/os": linux
+      containers:
+        - name: scc-app-redis
+          image: redis
+          env:
+            - name: ALLOW_EMPTY_PASSWORD
+              value: "yes"
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: 400m
+              memory: 512Mi
+          ports:
+            - containerPort: 6379
+              name: redis
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: scc-app-redis
+spec:
+  ports:
+    - port: 6379
+  selector:
+    app: scc-app-redis
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scc-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: scc-app
+  template:
+    metadata:
+      labels:
+        app: scc-app
+    spec:
+      nodeSelector:
+        "beta.kubernetes.io/os": linux
+      containers:
+        - name: scc-app
+          image: brunosilva58569/scc2223-app
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: 400m
+              memory: 512Mi
+          ports:
+            - containerPort: 8080
+          env:
+            - name: REDIS
+              value: "scc-app-redis"
+            - name: PERSISTENT-VOLUME
+              value: "/mnt/vol"
+          volumeMounts:
+            - mountPath: "/mnt/vol"
+              name: mediavolume
+      volumes:
+        - name: mediavolume
+          persistentVolumeClaim:
+            claimName: scc-app-azure-managed-disk
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: scc-app
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 8080
+  selector:
+    app: scc-app
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: scc-app-azure-managed-disk
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: azurefile
+  resources:
+    requests:
+      storage: 2Gi

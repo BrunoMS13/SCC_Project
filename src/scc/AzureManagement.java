@@ -62,11 +62,11 @@ public class AzureManagement {
 	static final String AZURE_COSMOSDB_DATABASE = "scc23db" + MY_SUFFIX;	// Cosmos DB database name
 	static final String[] BLOB_CONTAINERS = { "images" };	// Containers to add to the blob storage
 
-	static final Region[] REGIONS = new Region[] { Region.ASIA_EAST }; // Define the regions to deploy resources here
+	static final Region[] REGIONS = new Region[] { Region.EUROPE_WEST }; // Define the regions to deploy resources here
 	
 	// Name of resource group for each region
 	static final String[] AZURE_RG_REGIONS = Arrays.stream(REGIONS)
-			.map(reg -> "scc23-rg-" + reg.name() + "-" + MY_SUFFIX).toArray(String[]::new);
+			.map(reg -> "scc2223-cluster-58569").toArray(String[]::new);
 
 	// Name of application server to be launched in each regions -- launching the application
 	// server must be done using mvn, as you have been doing
